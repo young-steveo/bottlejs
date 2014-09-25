@@ -20,7 +20,7 @@ BottleJS supports IE9+ and other ECMAScript 5 compliant browsers.
 
 ## Installation
 
-Bower can be used in a browser or in a nodejs app.  It can be installed via bower or npm:
+BottleJS can be used in a browser or in a nodejs app.  It can be installed via bower or npm:
 
 ```bash
 $ bower install bottlejs
