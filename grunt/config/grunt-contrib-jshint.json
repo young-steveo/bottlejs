@@ -1,0 +1,8 @@
+{
+    "jshint" : {
+        "options" : {
+            "jshintrc" : ".jshintrc"
+        },
+        "source" : ["./gruntfile.js", "test/**/*.js", "dist/bottle.js"]
+    }
+}

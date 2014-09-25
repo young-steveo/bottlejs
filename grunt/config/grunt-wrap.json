@@ -1,0 +1,13 @@
+{
+    "wrap" : {
+        "files" : {
+            "src" : ["dist/bottle.js"],
+            "dest" : "dist/bottle.js",
+            "options" : {
+                "seperator" : "\n",
+                "indent" : "    ",
+                "wrapper" : [";(function(undefined) {\n    'use strict';", "}.call(this));"]
+            }
+        }
+    }
+}

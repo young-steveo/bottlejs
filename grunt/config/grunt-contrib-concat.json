@@ -1,0 +1,18 @@
+ {
+    "concat" : {
+        "dist" : {
+            "options" : {
+                "stripBanners" : false,
+                "separator" : "\n",
+                "banner" : "/**\n * BottleJS v<%= pkg.version %> - <%= grunt.template.today('yyyy-mm-dd') %>\n * <%= pkg.description %>\n *\n * Copyright (c) <%= grunt.template.today('yyyy') %> Stephen Young\n * Licensed <%= pkg.license %>\n */\n"
+            },
+            "src" : [
+                "src/globals.js",
+                "src/Bottle/**.js",
+                "src/api.js",
+                "src/export.js"
+            ],
+            "dest" : "dist/bottle.js"
+        }
+    }
+}

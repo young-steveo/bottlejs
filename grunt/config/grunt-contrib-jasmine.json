@@ -1,0 +1,10 @@
+{
+    "jasmine" : {
+        "tests" : {
+            "src" : "dist/bottle.js",
+            "options" : {
+                "specs" : "test/spec/*.spec.js"
+            }
+        }
+    }
+}
