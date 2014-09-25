@@ -18,6 +18,12 @@ BottleJS is a tiny yet powerful dependency injection container.  It features laz
 
 BottleJS supports IE9+ and other ECMAScript 5 compliant browsers.
 
+## Installation
+
+```bash
+$ bower install bottlejs
+```
+
 ## Simple Example
 
 The simplest recipe to get started with is `Bottle#service`.  Say you have a constructor for a service object:
