@@ -1,6 +1,5 @@
-<p align="center">
-	![BottleJS](/bottle-logo.jpg)
-</p>
+
+![BottleJS](/bottle-logo.jpg)
 # BottleJS
 
 > A powerful, extensible dependency injection micro container
