@@ -1,6 +1,6 @@
 
 ![BottleJS](/bottle-logo.jpg)
-# BottleJS
+# BottleJS [![Build Status](https://travis-ci.org/young-steveo/bottlejs.svg?branch=master)](https://travis-ci.org/young-steveo/bottlejs)
 
 > A powerful, extensible dependency injection micro container
 
