@@ -1,5 +1,5 @@
 {
-  "name": "BottleJS",
+  "name": "bottlejs",
   "version": "0.1.0",
   "description": "A powerful, extensible dependency injection micro container",
   "main": "dist/bottle.js",
