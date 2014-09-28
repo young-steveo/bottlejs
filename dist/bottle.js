@@ -1,20 +1,20 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v0.1.0 - 2014-09-24
+     * BottleJS v0.1.0 - 2014-09-28
      * A powerful, extensible dependency injection micro container
      *
      * Copyright (c) 2014 Stephen Young
      * Licensed MIT
      */
-
+    
     /**
      * Unique id counter;
      *
      * @type Number
      */
     var id = 0;
-
+    
     /**
      * Local slice alias
      *
@@ -35,7 +35,7 @@
             value : value,
             writable : false
         });
-
+    
         return this;
     };
     /**
@@ -56,8 +56,8 @@
      * @type Object
      */
     var middles = [];
-
-    var getMiddlewear = function getMiddlewear(id, name) {
+    
+    var getMiddleware = function getMiddleware(id, name) {
         var group = middles[id];
         if (!group) {
             group = middles[id] = {};
@@ -67,7 +67,7 @@
         }
         return group[name];
     };
-
+    
     /**
      * Register middleware.
      *
@@ -80,7 +80,7 @@
     		func = name;
     		name = '__global__';
     	}
-    	getMiddlewear(this.id, name).push(func);
+    	getMiddleware(this.id, name).push(func);
     	return this;
     };
     /**
@@ -89,14 +89,14 @@
      * @type Object
      */
     var providers = [];
-
+    
     var getProviders = function(id) {
         if (!providers[id]) {
             providers[id] = {};
         }
         return providers[id];
     };
-
+    
     /**
      * Used to process middleware in the provider
      *
@@ -107,7 +107,7 @@
     var reducer = function reducer(instance, func) {
         return func(instance);
     };
-
+    
     /**
      * Register a provider.
      *
@@ -117,17 +117,17 @@
      */
     var provider = function provider(name, Provider) {
         var providerName, providers, properties, container, id;
-
+    
         id = this.id;
         providers = getProviders(id);
         if (providers[name]) {
             return console.error(name + ' provider already registered.');
         }
-
+    
         container = this.container;
         providers[name] = Provider;
         providerName = name + 'Provider';
-
+    
         properties = Object.create(null);
         properties[providerName] = {
             configurable : true,
@@ -142,7 +142,7 @@
                 return instance;
             }
         };
-
+    
         properties[name] = {
             configurable : true,
             enumerable : true,
@@ -150,21 +150,21 @@
                 var provider = container[providerName], instance;
                 if (provider) {
                     instance = provider.$get(container);
-
-                    // filter through middlewear
-                    instance = getMiddlewear(id, '__global__')
-                        .concat(getMiddlewear(id, name))
+    
+                    // filter through middleware
+                    instance = getMiddleware(id, '__global__')
+                        .concat(getMiddleware(id, name))
                         .reduce(reducer, instance);
-
+    
                     delete container[providerName];
                     delete container[name];
-
+    
                     container[name] = instance;
                 }
                 return instance;
             }
         };
-
+    
         Object.defineProperties(container, properties);
         return this;
     };
@@ -177,7 +177,7 @@
     var mapContainer = function mapContainer(key) {
         return this.container[key];
     };
-
+    
     /**
      * Register a service inside a generic factory.
      *
@@ -209,10 +209,10 @@
             value : val,
             writable : true
         });
-
+    
         return this;
     };
-
+    
     /**
      * Bottle constructor
      */
@@ -223,19 +223,19 @@
     	this.id = id++;
     	this.container = {};
     };
-
+    
     /**
      * Bottle prototype
      */
     Bottle.prototype = {
         constant : constant,
         factory : factory,
-        middlewear : middlewear,
+        middleware : middleware,
         provider : provider,
         service : service,
         value : value
     };
-
+    
     /**
      * Bottle static
      */
@@ -247,7 +247,7 @@
      *
      * @see http://lodash.com/
      */
-
+    
     /**
      * Valid object type map
      *
@@ -257,30 +257,30 @@
         'function' : true,
         'object' : true
     };
-
+    
     (function exportBottle(root) {
-
+    
         /**
          * Free variable exports
          *
          * @type Function
          */
         var freeExports = objectTypes[typeof exports] && exports && !exports.nodeType && exports;
-
+    
         /**
          * Free variable module
          *
          * @type Object
          */
         var freeModule = objectTypes[typeof module] && module && !module.nodeType && module;
-
+    
         /**
          * CommonJS module.exports
          *
          * @type Function
          */
         var moduleExports = freeModule && freeModule.exports === freeExports && freeExports;
-
+    
         /**
          * Free variable `global`
          *
@@ -290,7 +290,7 @@
         if (freeGlobal && (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal)) {
             root = freeGlobal;
         }
-
+    
         /**
          * Export
          */
