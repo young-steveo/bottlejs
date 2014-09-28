@@ -6,7 +6,7 @@
 
 ## Introduction
 
-BottleJS is a tiny yet powerful dependency injection container.  It features lazy loading, middlewear hooks, and a clean api inspired by the [AngularJS Module API](https://docs.angularjs.org/api/ng/type/angular.Module) and the simple PHP library [Pimple](http://pimple.sensiolabs.org/).  You'll like BottleJS if you enjoy:
+BottleJS is a tiny yet powerful dependency injection container.  It features lazy loading, middleware hooks, and a clean api inspired by the [AngularJS Module API](https://docs.angularjs.org/api/ng/type/angular.Module) and the simple PHP library [Pimple](http://pimple.sensiolabs.org/).  You'll like BottleJS if you enjoy:
 
 * building a stack from components rather than a kitchen-sink framework.
 * uncoupled objects and dependency injection.
@@ -131,22 +131,22 @@ bottle.provider('Beer', function() {
 });
 ```
 
-## Middlewear
+## Middleware
 
-Bottle supports injecting middlewear into the provider pipeline with the `Bottle#middlewear` method.  Bottle middlewear are just simple functions that intercept a service in the provider phase after it has been created, but before it is accessed for the first time.  The function should return the service, or another object to be used as the service instead.
+Bottle supports injecting middleware into the provider pipeline with the `Bottle#middleware` method.  Bottle middleware are just simple functions that intercept a service in the provider phase after it has been created, but before it is accessed for the first time.  The function should return the service, or another object to be used as the service instead.
 
 ```js
 var bottle = new Bottle();
 bottle.service('Beer', Beer);
 bottle.service('Wine', Wine);
-bottle.middlewear(function(service) {
-	// this middlewear will be run for both Beer and Wine services.
+bottle.middleware(function(service) {
+	// this middleware will be run for both Beer and Wine services.
 	service.stayCold();
 	return service;
 });
 
-bottle.middlewear('Wine', function(wine) {
-	// this middlewear will only affect the Wine service.
+bottle.middleware('Wine', function(wine) {
+	// this middleware will only affect the Wine service.
 	wine.unCork();
 	return wine;
 });
@@ -172,13 +172,13 @@ Param       | Type       | Details
 **name**    | *String*   | The name of the service.  Must be unique to each Bottle instance.
 **Factory** | *Function* | A function that should return the service object.  Will only be called once; the Service will be a singleton.  Gets passed an instance of the container to allow dependency injection when creating the service.
 
-### middlewear(name, func)
+### middleware(name, func)
 
-Used to register a middlewear function that the provider will use to modify your services at creation time.
+Used to register a middleware function that the provider will use to modify your services at creation time.
 
 Param                      | Type       | Details
 :--------------------------|:-----------|:--------
-**name**<br />*(optional)* | *String*   | The name of the service this middlewear will affect. Will run for all services if not passed.
+**name**<br />*(optional)* | *String*   | The name of the service this middleware will affect. Will run for all services if not passed.
 **func**                   | *Function* | A function that will accept the service as the first parameter.  Should return the service, or a new object to be used as the service.
 
 ### provider(name, Provider)

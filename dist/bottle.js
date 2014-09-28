@@ -7,14 +7,14 @@
      * Copyright (c) 2014 Stephen Young
      * Licensed MIT
      */
-    
+
     /**
      * Unique id counter;
      *
      * @type Number
      */
     var id = 0;
-    
+
     /**
      * Local slice alias
      *
@@ -35,7 +35,7 @@
             value : value,
             writable : false
         });
-    
+
         return this;
     };
     /**
@@ -51,12 +51,12 @@
         });
     };
     /**
-     * Map of middlewear by index => name
+     * Map of middleware by index => name
      *
      * @type Object
      */
     var middles = [];
-    
+
     var getMiddlewear = function getMiddlewear(id, name) {
         var group = middles[id];
         if (!group) {
@@ -67,15 +67,15 @@
         }
         return group[name];
     };
-    
+
     /**
-     * Register middlewear.
+     * Register middleware.
      *
      * @param String name
      * @param Function func
      * @return Bottle
      */
-    var middlewear = function middlewear(name, func) {
+    var middleware = function middleware(name, func) {
     	if (typeof name === 'function') {
     		func = name;
     		name = '__global__';
@@ -89,16 +89,16 @@
      * @type Object
      */
     var providers = [];
-    
+
     var getProviders = function(id) {
         if (!providers[id]) {
             providers[id] = {};
         }
         return providers[id];
     };
-    
+
     /**
-     * Used to process middlewear in the provider
+     * Used to process middleware in the provider
      *
      * @param Object instance
      * @param Function func
@@ -107,7 +107,7 @@
     var reducer = function reducer(instance, func) {
         return func(instance);
     };
-    
+
     /**
      * Register a provider.
      *
@@ -117,17 +117,17 @@
      */
     var provider = function provider(name, Provider) {
         var providerName, providers, properties, container, id;
-    
+
         id = this.id;
         providers = getProviders(id);
         if (providers[name]) {
             return console.error(name + ' provider already registered.');
         }
-    
+
         container = this.container;
         providers[name] = Provider;
         providerName = name + 'Provider';
-    
+
         properties = Object.create(null);
         properties[providerName] = {
             configurable : true,
@@ -142,7 +142,7 @@
                 return instance;
             }
         };
-    
+
         properties[name] = {
             configurable : true,
             enumerable : true,
@@ -150,21 +150,21 @@
                 var provider = container[providerName], instance;
                 if (provider) {
                     instance = provider.$get(container);
-    
+
                     // filter through middlewear
                     instance = getMiddlewear(id, '__global__')
                         .concat(getMiddlewear(id, name))
                         .reduce(reducer, instance);
-    
+
                     delete container[providerName];
                     delete container[name];
-    
+
                     container[name] = instance;
                 }
                 return instance;
             }
         };
-    
+
         Object.defineProperties(container, properties);
         return this;
     };
@@ -177,7 +177,7 @@
     var mapContainer = function mapContainer(key) {
         return this.container[key];
     };
-    
+
     /**
      * Register a service inside a generic factory.
      *
@@ -209,10 +209,10 @@
             value : val,
             writable : true
         });
-    
+
         return this;
     };
-    
+
     /**
      * Bottle constructor
      */
@@ -223,7 +223,7 @@
     	this.id = id++;
     	this.container = {};
     };
-    
+
     /**
      * Bottle prototype
      */
@@ -235,7 +235,7 @@
         service : service,
         value : value
     };
-    
+
     /**
      * Bottle static
      */
@@ -247,7 +247,7 @@
      *
      * @see http://lodash.com/
      */
-    
+
     /**
      * Valid object type map
      *
@@ -257,30 +257,30 @@
         'function' : true,
         'object' : true
     };
-    
+
     (function exportBottle(root) {
-    
+
         /**
          * Free variable exports
          *
          * @type Function
          */
         var freeExports = objectTypes[typeof exports] && exports && !exports.nodeType && exports;
-    
+
         /**
          * Free variable module
          *
          * @type Object
          */
         var freeModule = objectTypes[typeof module] && module && !module.nodeType && module;
-    
+
         /**
          * CommonJS module.exports
          *
          * @type Function
          */
         var moduleExports = freeModule && freeModule.exports === freeExports && freeExports;
-    
+
         /**
          * Free variable `global`
          *
@@ -290,7 +290,7 @@
         if (freeGlobal && (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal)) {
             root = freeGlobal;
         }
-    
+
         /**
          * Export
          */

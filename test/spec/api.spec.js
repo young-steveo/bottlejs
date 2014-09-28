@@ -28,8 +28,8 @@
 			it("exposes factory", function() {
 				expect(Bottle.pop().factory).toBeDefined();
 			});
-			it("exposes middlewear", function() {
-				expect(Bottle.pop().middlewear).toBeDefined();
+			it("exposes middleware", function() {
+				expect(Bottle.pop().middleware).toBeDefined();
 			});
 			it("exposes provider", function() {
 				expect(Bottle.pop().provider).toBeDefined();
