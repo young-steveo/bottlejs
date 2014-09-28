@@ -1,7 +1,7 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v0.1.0 - 2014-09-24
+     * BottleJS v0.1.0 - 2014-09-28
      * A powerful, extensible dependency injection micro container
      *
      * Copyright (c) 2014 Stephen Young
@@ -51,13 +51,13 @@
         });
     };
     /**
-     * Map of middlewear by index => name
+     * Map of middleware by index => name
      *
      * @type Object
      */
     var middles = [];
     
-    var getMiddlewear = function getMiddlewear(id, name) {
+    var getMiddleware = function getMiddleware(id, name) {
         var group = middles[id];
         if (!group) {
             group = middles[id] = {};
@@ -69,18 +69,18 @@
     };
     
     /**
-     * Register middlewear.
+     * Register middleware.
      *
      * @param String name
      * @param Function func
      * @return Bottle
      */
-    var middlewear = function middlewear(name, func) {
+    var middleware = function middleware(name, func) {
     	if (typeof name === 'function') {
     		func = name;
     		name = '__global__';
     	}
-    	getMiddlewear(this.id, name).push(func);
+    	getMiddleware(this.id, name).push(func);
     	return this;
     };
     /**
@@ -98,7 +98,7 @@
     };
     
     /**
-     * Used to process middlewear in the provider
+     * Used to process middleware in the provider
      *
      * @param Object instance
      * @param Function func
@@ -151,9 +151,9 @@
                 if (provider) {
                     instance = provider.$get(container);
     
-                    // filter through middlewear
-                    instance = getMiddlewear(id, '__global__')
-                        .concat(getMiddlewear(id, name))
+                    // filter through middleware
+                    instance = getMiddleware(id, '__global__')
+                        .concat(getMiddleware(id, name))
                         .reduce(reducer, instance);
     
                     delete container[providerName];
@@ -230,7 +230,7 @@
     Bottle.prototype = {
         constant : constant,
         factory : factory,
-        middlewear : middlewear,
+        middleware : middleware,
         provider : provider,
         service : service,
         value : value

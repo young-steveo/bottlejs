@@ -1,11 +1,11 @@
 /**
- * Map of middlewear by index => name
+ * Map of middleware by index => name
  *
  * @type Object
  */
 var middles = [];
 
-var getMiddlewear = function getMiddlewear(id, name) {
+var getMiddleware = function getMiddleware(id, name) {
     var group = middles[id];
     if (!group) {
         group = middles[id] = {};
@@ -17,17 +17,17 @@ var getMiddlewear = function getMiddlewear(id, name) {
 };
 
 /**
- * Register middlewear.
+ * Register middleware.
  *
  * @param String name
  * @param Function func
  * @return Bottle
  */
-var middlewear = function middlewear(name, func) {
+var middleware = function middleware(name, func) {
 	if (typeof name === 'function') {
 		func = name;
 		name = '__global__';
 	}
-	getMiddlewear(this.id, name).push(func);
+	getMiddleware(this.id, name).push(func);
 	return this;
 };

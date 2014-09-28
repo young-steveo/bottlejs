@@ -16,7 +16,7 @@ var Bottle = function Bottle() {
 Bottle.prototype = {
     constant : constant,
     factory : factory,
-    middlewear : middlewear,
+    middleware : middleware,
     provider : provider,
     service : service,
     value : value
