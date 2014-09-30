@@ -1,0 +1,7 @@
+bottle-logo.jpg
+bower.json
+dist/*.min.*
+grunt/
+gruntfile.js
+src/
+test/
