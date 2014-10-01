@@ -13,7 +13,7 @@ var getProviders = function(id) {
 };
 
 /**
- * Used to process middleware in the provider
+ * Used to process decorators in the provider
  *
  * @param Object instance
  * @param Function func
@@ -66,9 +66,9 @@ var provider = function provider(name, Provider) {
             if (provider) {
                 instance = provider.$get(container);
 
-                // filter through middleware
-                instance = getMiddleware(id, '__global__')
-                    .concat(getMiddleware(id, name))
+                // filter through decorators
+                instance = getDecorators(id, '__global__')
+                    .concat(getDecorators(id, name))
                     .reduce(reducer, instance);
 
                 delete container[providerName];

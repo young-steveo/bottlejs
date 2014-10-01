@@ -1,11 +1,11 @@
 /**
- * Map of middleware by index => name
+ * Map of decorator by index => name
  *
  * @type Object
  */
 var middles = [];
 
-var getMiddleware = function getMiddleware(id, name) {
+var getDecorators = function getDecorators(id, name) {
     var group = middles[id];
     if (!group) {
         group = middles[id] = {};
@@ -17,17 +17,17 @@ var getMiddleware = function getMiddleware(id, name) {
 };
 
 /**
- * Register middleware.
+ * Register decorator.
  *
  * @param String name
  * @param Function func
  * @return Bottle
  */
-var middleware = function middleware(name, func) {
+var decorator = function decorator(name, func) {
 	if (typeof name === 'function') {
 		func = name;
 		name = '__global__';
 	}
-	getMiddleware(this.id, name).push(func);
+	getDecorators(this.id, name).push(func);
 	return this;
 };

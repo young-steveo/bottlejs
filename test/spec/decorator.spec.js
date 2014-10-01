@@ -3,14 +3,14 @@
 	'use strict';
 
 	/**
-	 * Bottle Middleware test suite
+	 * Bottle Decorator test suite
 	 */
-	describe('Bottle#middleware', function() {
-		it('will add middleware for every provider if no key is passed', function() {
+	describe('Bottle#decorator', function() {
+		it('will add a decorator for every provider if no key is passed', function() {
 			var b = new Bottle();
 			b.service('Thing', function() { this.name = 'Thing'; });
 			b.service('Prop', function() { this.name = 'Prop'; });
-			b.middleware(function(Service) {
+			b.decorator(function(Service) {
 				Service.name = 'FooBar';
 				return Service;
 			});
@@ -18,11 +18,11 @@
 			expect(b.container.Prop.name).toBe('FooBar');
 		});
 
-		it('will add middleware for a single type if a name is passed', function() {
+		it('will add a decorator for a single type if a name is passed', function() {
 			var b = new Bottle();
 			b.service('Thing', function() { this.name = 'Thing'; });
 			b.service('Prop', function() { this.name = 'Prop'; });
-			b.middleware('Thing', function(Service) {
+			b.decorator('Thing', function(Service) {
 				Service.name = 'FooBar';
 				return Service;
 			});

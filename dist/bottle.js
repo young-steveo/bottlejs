@@ -1,7 +1,7 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v0.2.0 - 2014-09-28
+     * BottleJS v0.2.0 - 2014-09-30
      * A powerful, extensible dependency injection micro container
      *
      * Copyright (c) 2014 Stephen Young
@@ -39,25 +39,13 @@
         return this;
     };
     /**
-     * Register a factory inside a generic provider.
-     *
-     * @param String name
-     * @param Function Factory
-     * @return Bottle
-     */
-    var factory = function factory(name, Factory) {
-        return provider.call(this, name, function GenericProvider() {
-            this.$get = Factory;
-        });
-    };
-    /**
-     * Map of middleware by index => name
+     * Map of decorator by index => name
      *
      * @type Object
      */
     var middles = [];
     
-    var getMiddleware = function getMiddleware(id, name) {
+    var getDecorators = function getDecorators(id, name) {
         var group = middles[id];
         if (!group) {
             group = middles[id] = {};
@@ -69,19 +57,31 @@
     };
     
     /**
-     * Register middleware.
+     * Register decorator.
      *
      * @param String name
      * @param Function func
      * @return Bottle
      */
-    var middleware = function middleware(name, func) {
+    var decorator = function decorator(name, func) {
     	if (typeof name === 'function') {
     		func = name;
     		name = '__global__';
     	}
-    	getMiddleware(this.id, name).push(func);
+    	getDecorators(this.id, name).push(func);
     	return this;
+    };
+    /**
+     * Register a factory inside a generic provider.
+     *
+     * @param String name
+     * @param Function Factory
+     * @return Bottle
+     */
+    var factory = function factory(name, Factory) {
+        return provider.call(this, name, function GenericProvider() {
+            this.$get = Factory;
+        });
     };
     /**
      * Map of provider constructors by index => name
@@ -98,7 +98,7 @@
     };
     
     /**
-     * Used to process middleware in the provider
+     * Used to process decorators in the provider
      *
      * @param Object instance
      * @param Function func
@@ -151,9 +151,9 @@
                 if (provider) {
                     instance = provider.$get(container);
     
-                    // filter through middleware
-                    instance = getMiddleware(id, '__global__')
-                        .concat(getMiddleware(id, name))
+                    // filter through decorators
+                    instance = getDecorators(id, '__global__')
+                        .concat(getDecorators(id, name))
                         .reduce(reducer, instance);
     
                     delete container[providerName];
@@ -230,7 +230,7 @@
     Bottle.prototype = {
         constant : constant,
         factory : factory,
-        middleware : middleware,
+        decorator : decorator,
         provider : provider,
         service : service,
         value : value
