@@ -21,6 +21,40 @@
      * @type Functions
      */
     var slice = Array.prototype.slice;
+    
+    /**
+     * Get a group (middleware, decorator, etc.) for this bottle instance and service name.
+     *
+     * @param Array collection
+     * @param Number id
+     * @param String name
+     * @return Array
+     */
+    var get = function get(collection, id, name) {
+    	var group = collection[id];
+        if (!group) {
+            group = collection[id] = {};
+        }
+        if (!group[name]) {
+            group[name] = [];
+        }
+        return group[name];
+    };
+    
+    /**
+     * A helper function for pushing middleware and decorators onto their stacks.
+     *
+     * @param Array collection
+     * @param String name
+     * @param Function func
+     */
+    var set = function set(collection, id, name, func) {
+    	if (typeof name === 'function') {
+            func = name;
+            name = '__global__';
+        }
+        get(collection, id, name).push(func);
+    };
     /**
      * Register a constant
      *
@@ -45,17 +79,6 @@
      */
     var decorators = [];
     
-    var getDecorators = function getDecorators(id, name) {
-        var group = decorators[id];
-        if (!group) {
-            group = decorators[id] = {};
-        }
-        if (!group[name]) {
-            group[name] = [];
-        }
-        return group[name];
-    };
-    
     /**
      * Register decorator.
      *
@@ -64,11 +87,7 @@
      * @return Bottle
      */
     var decorator = function decorator(name, func) {
-    	if (typeof name === 'function') {
-    		func = name;
-    		name = '__global__';
-    	}
-    	getDecorators(this.id, name).push(func);
+        set(decorators, this.id, name, func);
     	return this;
     };
     /**
@@ -82,6 +101,60 @@
         return provider.call(this, name, function GenericProvider() {
             this.$get = Factory;
         });
+    };
+    /**
+     * Map of middleware by index => name
+     *
+     * @type Object
+     */
+    var middles = [];
+    
+    /**
+     * Function used by provider to set up middleware for each request.
+     *
+     * @param Number id
+     * @param String name
+     * @param Object instance
+     * @param Object container
+     * @return void
+     */
+    var applyMiddleware = function(id, name, instance, container) {
+        var middleware = get(middles, id, '__global__').concat(get(middles, id, name));
+        var descriptor = {
+            configurable : true,
+            enumerable : true
+        };
+        if (middleware.length) {
+            descriptor.get = function getWithMiddlewear() {
+                var index = 0;
+                var next = function() {
+                    if (middleware[index]) {
+                        middleware[index++](instance, next);
+                    }
+                };
+                next();
+                return instance;
+            };
+        } else {
+            descriptor.value = instance;
+            descriptor.writable = true;
+        }
+    
+        Object.defineProperty(container, name, descriptor);
+    
+        return container[name];
+    };
+    
+    /**
+     * Register middleware.
+     *
+     * @param String name
+     * @param Function func
+     * @return Bottle
+     */
+    var middleware = function middleware(name, func) {
+        set(middles, this.id, name, func);
+        return this;
     };
     /**
      * Map of provider constructors by index => name
@@ -147,21 +220,19 @@
             configurable : true,
             enumerable : true,
             get : function getService() {
-                var provider = container[providerName], instance;
+                var provider = container[providerName];
+                var instance;
+    
                 if (provider) {
-                    instance = provider.$get(container);
-    
-                    // filter through decorators
-                    instance = getDecorators(id, '__global__')
-                        .concat(getDecorators(id, name))
-                        .reduce(reducer, instance);
-    
                     delete container[providerName];
                     delete container[name];
     
-                    container[name] = instance;
+                    // filter through decorators
+                    instance = get(decorators, id, '__global__')
+                        .concat(get(decorators, id, name))
+                        .reduce(reducer, provider.$get(container));
                 }
-                return instance;
+                return instance ? applyMiddleware(id, name, instance, container) : instance;
             }
         };
     
@@ -229,8 +300,9 @@
      */
     Bottle.prototype = {
         constant : constant,
-        factory : factory,
         decorator : decorator,
+        factory : factory,
+        middleware : middleware,
         provider : provider,
         service : service,
         value : value
