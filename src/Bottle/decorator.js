@@ -3,12 +3,12 @@
  *
  * @type Object
  */
-var middles = [];
+var decorators = [];
 
 var getDecorators = function getDecorators(id, name) {
-    var group = middles[id];
+    var group = decorators[id];
     if (!group) {
-        group = middles[id] = {};
+        group = decorators[id] = {};
     }
     if (!group[name]) {
         group[name] = [];
