@@ -22,7 +22,7 @@ var slice = Array.prototype.slice;
  * @return Array
  */
 var get = function get(collection, id, name) {
-	var group = collection[id];
+    var group = collection[id];
     if (!group) {
         group = collection[id] = {};
     }
@@ -40,7 +40,7 @@ var get = function get(collection, id, name) {
  * @param Function func
  */
 var set = function set(collection, id, name, func) {
-	if (typeof name === 'function') {
+    if (typeof name === 'function') {
         func = name;
         name = '__global__';
     }

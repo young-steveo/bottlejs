@@ -14,5 +14,5 @@ var decorators = [];
  */
 var decorator = function decorator(name, func) {
     set(decorators, this.id, name, func);
-	return this;
+    return this;
 };

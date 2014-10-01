@@ -31,7 +31,7 @@
      * @return Array
      */
     var get = function get(collection, id, name) {
-    	var group = collection[id];
+        var group = collection[id];
         if (!group) {
             group = collection[id] = {};
         }
@@ -49,12 +49,13 @@
      * @param Function func
      */
     var set = function set(collection, id, name, func) {
-    	if (typeof name === 'function') {
+        if (typeof name === 'function') {
             func = name;
             name = '__global__';
         }
         get(collection, id, name).push(func);
     };
+    
     /**
      * Register a constant
      *
@@ -72,6 +73,7 @@
     
         return this;
     };
+    
     /**
      * Map of decorator by index => name
      *
@@ -88,8 +90,9 @@
      */
     var decorator = function decorator(name, func) {
         set(decorators, this.id, name, func);
-    	return this;
+        return this;
     };
+    
     /**
      * Register a factory inside a generic provider.
      *
@@ -102,6 +105,7 @@
             this.$get = Factory;
         });
     };
+    
     /**
      * Map of middleware by index => name
      *
@@ -156,6 +160,7 @@
         set(middles, this.id, name, func);
         return this;
     };
+    
     /**
      * Map of provider constructors by index => name
      *
@@ -239,6 +244,7 @@
         Object.defineProperties(container, properties);
         return this;
     };
+    
     /**
      * Map used to inject dependencies in the generic factory;
      *
@@ -266,6 +272,7 @@
             return new Service();
         });
     };
+    
     /**
      * Register a value
      *
@@ -284,15 +291,16 @@
         return this;
     };
     
+    
     /**
      * Bottle constructor
      */
     var Bottle = function Bottle() {
-    	if (!(this instanceof Bottle)) {
-    		return new Bottle();
-    	}
-    	this.id = id++;
-    	this.container = {};
+        if (!(this instanceof Bottle)) {
+            return new Bottle();
+        }
+        this.id = id++;
+        this.container = {};
     };
     
     /**
@@ -312,8 +320,9 @@
      * Bottle static
      */
     Bottle.pop = function pop() {
-    	return new Bottle();
+        return new Bottle();
     };
+    
     /**
      * Exports script adapted from lodash v2.4.1 Modern Build
      *
@@ -379,4 +388,5 @@
             root.Bottle = Bottle;
         }
     }((objectTypes[typeof window] && window) || this));
+    
 }.call(this));

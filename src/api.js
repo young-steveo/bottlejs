@@ -3,11 +3,11 @@
  * Bottle constructor
  */
 var Bottle = function Bottle() {
-	if (!(this instanceof Bottle)) {
-		return new Bottle();
-	}
-	this.id = id++;
-	this.container = {};
+    if (!(this instanceof Bottle)) {
+        return new Bottle();
+    }
+    this.id = id++;
+    this.container = {};
 };
 
 /**
@@ -27,5 +27,5 @@ Bottle.prototype = {
  * Bottle static
  */
 Bottle.pop = function pop() {
-	return new Bottle();
+    return new Bottle();
 };
