@@ -62,21 +62,19 @@ var provider = function provider(name, Provider) {
         configurable : true,
         enumerable : true,
         get : function getService() {
-            var provider = container[providerName], instance;
+            var provider = container[providerName];
+            var instance;
+
             if (provider) {
-                instance = provider.$get(container);
-
-                // filter through decorators
-                instance = getDecorators(id, '__global__')
-                    .concat(getDecorators(id, name))
-                    .reduce(reducer, instance);
-
                 delete container[providerName];
                 delete container[name];
 
-                container[name] = instance;
+                // filter through decorators
+                instance = get(decorators, id, '__global__')
+                    .concat(get(decorators, id, name))
+                    .reduce(reducer, provider.$get(container));
             }
-            return instance;
+            return instance ? applyMiddleware(id, name, instance, container) : instance;
         }
     };
 

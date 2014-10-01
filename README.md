@@ -90,14 +90,14 @@ bottle.service('Barley', Barley);
 bottle.service('Hops', Hops);
 bottle.service('Water', Water);
 bottle.factory('Beer', function(container) {
-	var barley = container.Barley;
-	var hops = container.Hops;
-	var water = container.Water;
+    var barley = container.Barley;
+    var hops = container.Hops;
+    var water = container.Water;
 
-	barley.halved();
-	hops.doubled();
-	water.spring();
-	return new Beer(barley, hops, water);
+    barley.halved();
+    hops.doubled();
+    water.spring();
+    return new Beer(barley, hops, water);
 });
 ```
 
@@ -111,23 +111,23 @@ bottle.service('Barley', Barley);
 bottle.service('Hops', Hops);
 bottle.service('Water', Water);
 bottle.provider('Beer', function() {
-	// This environment may not support water.
-	// We should polyfill it.
-	if (waterNotSupported) {
-		Beer.pollyfillWater();
-	}
+    // This environment may not support water.
+    // We should polyfill it.
+    if (waterNotSupported) {
+        Beer.pollyfillWater();
+    }
 
     // this is the service factory.
-	this.$get = function(container) {
-		var barley = container.Barley;
-		var hops = container.Hops;
-		var water = container.Water;
+    this.$get = function(container) {
+        var barley = container.Barley;
+        var hops = container.Hops;
+        var water = container.Water;
 
-		barley.halved();
-		hops.doubled();
-		water.spring();
-		return new Beer(barley, hops, water);
-	};
+        barley.halved();
+        hops.doubled();
+        water.spring();
+        return new Beer(barley, hops, water);
+    };
 });
 ```
 
@@ -140,15 +140,35 @@ var bottle = new Bottle();
 bottle.service('Beer', Beer);
 bottle.service('Wine', Wine);
 bottle.decorator(function(service) {
-	// this decorator will be run for both Beer and Wine services.
-	service.stayCold();
-	return service;
+    // this decorator will be run for both Beer and Wine services.
+    service.stayCold();
+    return service;
 });
 
 bottle.decorator('Wine', function(wine) {
-	// this decorator will only affect the Wine service.
-	wine.unCork();
-	return wine;
+    // this decorator will only affect the Wine service.
+    wine.unCork();
+    return wine;
+});
+```
+
+## Middleware
+
+Bottle middleware are similar to decorators, but they are executed every time a service is accessed from the container.  They are passed the service instance and a `next` function:
+
+```js
+var bottle = new Bottle();
+bottle.service('Beer', Beer);
+bottle.middleware(function(service, next) {
+    // this middleware will be executed for all services
+    console.log('A service was accessed!');
+    next();
+});
+
+bottle.decorator('Beer', function(beer, next) {
+    // this middleware will only affect the Beer service.
+    console.log('Beer?  Nice.  Tip your bartender...');
+    next();
 });
 ```
 
@@ -180,6 +200,15 @@ Param       | Type       | Details
 :-----------|:-----------|:--------
 **name**    | *String*   | The name of the service.  Must be unique to each Bottle instance.
 **Factory** | *Function* | A function that should return the service object.  Will only be called once; the Service will be a singleton.  Gets passed an instance of the container to allow dependency injection when creating the service.
+
+### middleware(name, func)
+
+Used to register a middleware function.  This function will be executed every time the service is accessed.
+
+Param                      | Type       | Details
+:--------------------------|:-----------|:--------
+**name**<br />*(optional)* | *String*   | The name of the service for which this middleware will be called. Will run for all services if not passed.
+**func**                   | *Function* | A function that will accept the service as the first parameter, and a `next` function as the second parameter.  Should execute `next()` to allow other middleware in the stack to execute.
 
 ### provider(name, Provider)
 
