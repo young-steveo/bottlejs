@@ -1,7 +1,7 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v0.2.0 - 2014-09-30
+     * BottleJS v0.3.0 - 2014-10-01
      * A powerful, extensible dependency injection micro container
      *
      * Copyright (c) 2014 Stephen Young
@@ -43,12 +43,12 @@
      *
      * @type Object
      */
-    var middles = [];
+    var decorators = [];
     
     var getDecorators = function getDecorators(id, name) {
-        var group = middles[id];
+        var group = decorators[id];
         if (!group) {
-            group = middles[id] = {};
+            group = decorators[id] = {};
         }
         if (!group[name]) {
             group[name] = [];
