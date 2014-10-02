@@ -16,9 +16,10 @@
                 expect(Bottle() instanceof Bottle).toBe(true);
                 /* jshint newcap: true */
             });
-
-            it("creates a new instance via Bottle.pop", function() {
-                expect(Bottle.pop() instanceof Bottle).toBe(true);
+            it("creates the same instance if called like a function with a name", function() {
+                /* jshint newcap: false */
+                expect(Bottle("Fizz")).toBe(Bottle("Fizz"));
+                /* jshint newcap: true */
             });
         });
         describe("prototype", function() {

@@ -1,7 +1,7 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v0.4.1 - 2014-10-01
+     * BottleJS v0.4.2 - 2014-10-02
      * A powerful, extensible dependency injection micro container
      *
      * Copyright (c) 2014 Stephen Young
@@ -162,6 +162,34 @@
     };
     
     /**
+     * Named bottle instances
+     *
+     * @type Object
+     */
+    var bottles = {};
+    
+    /**
+     * Get an instance of bottle.
+     *
+     * If a name is provided the instance will be stored in a local hash.  Calling Bottle.pop multiple
+     * times with the same name will return the same instance.
+     *
+     * @param String name
+     * @return Bottle
+     */
+    var pop = function pop(name) {
+        var instance;
+        if (name) {
+            instance = bottles[name];
+            if (!instance) {
+                bottles[name] = instance = new Bottle();
+            }
+            return instance;
+        }
+        return new Bottle();
+    };
+    
+    /**
      * Map of provider constructors by index => name
      *
      * @type Object
@@ -294,11 +322,14 @@
     
     /**
      * Bottle constructor
+     *
+     * @param String name Optional name for functional construction
      */
-    var Bottle = function Bottle() {
+    var Bottle = function Bottle(name) {
         if (!(this instanceof Bottle)) {
-            return new Bottle();
+            return Bottle.pop(name);
         }
+    
         this.id = id++;
         this.container = {};
     };
@@ -319,9 +350,7 @@
     /**
      * Bottle static
      */
-    Bottle.pop = function pop() {
-        return new Bottle();
-    };
+    Bottle.pop = pop;
     
     /**
      * Exports script adapted from lodash v2.4.1 Modern Build

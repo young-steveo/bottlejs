@@ -174,7 +174,19 @@ bottle.decorator('Beer', function(beer, next) {
 
 ## API
 
-### constant(name, value)
+### Bottle
+
+#### pop([name])
+
+Used to get an instance of bottle.  If a name is passed, bottle will return the same instance.  Calling the Bottle constructor as a function will call and return return `Bottle.pop`, so `Bottle.pop('Soda') === Bottle('pop')`
+
+Param                      | Type       | Details
+:--------------------------|:-----------|:--------
+**name**<br />*(optional)* | The name of the bottle. If passed, bottle will store the instance internally and return the same instance if `Bottle.pop` is subsequently called with the same name.
+
+### Bottle.prototype
+
+#### constant(name, value)
 
 Used to add a read only value to the container.
 
@@ -183,7 +195,7 @@ Param     | Type       | Details
 **name**  | *String*   | The name of the constant.  Must be unique to each Bottle instance.
 **value** | *Mixed*    | A value that will be defined as enumerable, but not writable.
 
-### decorator(name, func)
+#### decorator(name, func)
 
 Used to register a decorator function that the provider will use to modify your services at creation time.
 
@@ -192,7 +204,7 @@ Param                      | Type       | Details
 **name**<br />*(optional)* | *String*   | The name of the service this decorator will affect. Will run for all services if not passed.
 **func**                   | *Function* | A function that will accept the service as the first parameter.  Should return the service, or a new object to be used as the service.
 
-### factory(name, Factory)
+#### factory(name, Factory)
 
 Used to register a service factory
 
@@ -201,7 +213,7 @@ Param       | Type       | Details
 **name**    | *String*   | The name of the service.  Must be unique to each Bottle instance.
 **Factory** | *Function* | A function that should return the service object.  Will only be called once; the Service will be a singleton.  Gets passed an instance of the container to allow dependency injection when creating the service.
 
-### middleware(name, func)
+#### middleware(name, func)
 
 Used to register a middleware function.  This function will be executed every time the service is accessed.
 
@@ -210,7 +222,7 @@ Param                      | Type       | Details
 **name**<br />*(optional)* | *String*   | The name of the service for which this middleware will be called. Will run for all services if not passed.
 **func**                   | *Function* | A function that will accept the service as the first parameter, and a `next` function as the second parameter.  Should execute `next()` to allow other middleware in the stack to execute.
 
-### provider(name, Provider)
+#### provider(name, Provider)
 
 Used to register a service provider
 
@@ -219,7 +231,7 @@ Param        | Type       | Details
 **name**     | *String*   | The name of the service.  Must be unique to each Bottle instance.
 **Provider** | *Function* | A constructor function that will be instantiated as a singleton.  Should expose a function called `$get` that will be used as a factory to instantiate the service.
 
-### service(name, Constructor [, dependency [, ...]])
+#### service(name, Constructor [, dependency [, ...]])
 
 Used to register a service constructor
 
@@ -229,7 +241,7 @@ Param                            | Type       | Details
 **Constructor**                  | *Function* | A constructor function that will be instantiated as a singleton.
 **dependency**<br />*(optional)* | *String*   | An optional name for a dependency to be passed to the constructor.  A dependency will be passed to the constructor for each name passed to `Bottle#service` in the order they are listed.
 
-### value(name, val)
+#### value(name, val)
 
 Used to add an arbitrary value to the container.
 

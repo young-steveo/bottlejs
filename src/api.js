@@ -1,11 +1,14 @@
 
 /**
  * Bottle constructor
+ *
+ * @param String name Optional name for functional construction
  */
-var Bottle = function Bottle() {
+var Bottle = function Bottle(name) {
     if (!(this instanceof Bottle)) {
-        return new Bottle();
+        return Bottle.pop(name);
     }
+
     this.id = id++;
     this.container = {};
 };
@@ -26,6 +29,4 @@ Bottle.prototype = {
 /**
  * Bottle static
  */
-Bottle.pop = function pop() {
-    return new Bottle();
-};
+Bottle.pop = pop;
