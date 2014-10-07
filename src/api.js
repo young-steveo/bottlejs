@@ -23,6 +23,7 @@ Bottle.prototype = {
     factory : factory,
     middleware : middleware,
     provider : provider,
+    register : register,
     service : service,
     value : value
 };

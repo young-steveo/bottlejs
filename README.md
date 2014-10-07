@@ -240,6 +240,15 @@ Param        | Type       | Details
 **name**     | *String*   | The name of the service.  Must be unique to each Bottle instance.
 **Provider** | *Function* | A constructor function that will be instantiated as a singleton.  Should expose a function called `$get` that will be used as a factory to instantiate the service.
 
+#### register(Obj)
+
+Used to register a service, factory, provider, or value based on properties of the Obj.
+
+Param   | Type       | Details
+:-------|:-----------|:--------
+**Obj** | *Object*\|*Function* | An object or constructor with one of several properties:<br /><ul><li>**Obj.$name** &mdash; *required* &mdash; the name used to register the object</li><li>**Obj.$type** &mdash; *optional* &mdash; the method used to register the object.  Defaults to `'service'` in which case the Obj will be treated as a constructor. Valid types are: `'service'`, `'factory'`, `'provider'`, `'value'`</li><li>**Obj.$inject** &mdash; *optional* &mdash; If `Obj.$type` is `'service'`, this property can be a string name or an array of names of dependencies to inject into the constructor.<br />E.g. `Obj.$inject = ['dep1', 'dep2'];`</li></ul>
+
+
 #### service(name, Constructor [, dependency [, ...]])
 
 Used to register a service constructor

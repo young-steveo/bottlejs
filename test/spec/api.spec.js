@@ -35,6 +35,9 @@
             it("exposes provider", function() {
                 expect(Bottle.pop().provider).toBeDefined();
             });
+            it("exposes register", function() {
+                expect(Bottle.pop().register).toBeDefined();
+            });
             it("exposes service", function() {
                 expect(Bottle.pop().service).toBeDefined();
             });
