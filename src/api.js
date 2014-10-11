@@ -23,7 +23,8 @@ Bottle.prototype = {
     middleware : middleware,
     provider : provider,
     service : service,
-    value : value
+    value : value,
+    digest : digest
 };
 
 /**
