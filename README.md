@@ -249,3 +249,12 @@ Param    | Type     | Details
 :--------|:---------|:--------
 **name** | *String* | The name of the value.  Must be unique to each Bottle instance.
 **val**  | *Mixed*  | A value that will be defined as enumerable, but not writable.
+
+#### digest(providers)
+
+Immediately instantiate an array of providers and return their instances
+in the order of the array of instances.
+
+Param         | Type    | Details
+:-------------|:--------|:--------
+**providers** | *Array* | Array of providers that should be instantiated.
