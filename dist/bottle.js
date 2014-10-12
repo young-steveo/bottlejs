@@ -1,7 +1,7 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v0.4.2 - 2014-10-07
+     * BottleJS v0.5.0 - 2014-10-12
      * A powerful, extensible dependency injection micro container
      *
      * Copyright (c) 2014 Stephen Young
@@ -91,6 +91,38 @@
     var decorator = function decorator(name, func) {
         set(decorators, this.id, name, func);
         return this;
+    };
+    
+    /**
+     * Map of deferred functions by id => name
+     *
+     * @type Object
+     */
+    var deferred = [];
+    
+    /**
+     * Register a function that will be executed when Bottle#resolve is called.
+     *
+     * @param Function func
+     * @return Bottle
+     */
+    var defer = function defer(func) {
+        set(deferred, this.id, func);
+        return this;
+    };
+    
+    var getService = function(service) {
+        return this.container[service];
+    };
+    
+    /**
+     * Immediately instantiates the provided list of services and returns them.
+     *
+     * @param array services
+     * @return array Array of instances (in the order they were provided)
+     */
+    var digest = function digest(services) {
+        return (services || []).map(getService, this);
     };
     
     /**
@@ -288,6 +320,21 @@
         return this[Obj.$type || 'service'].apply(this, [Obj.$name, Obj].concat(Obj.$inject || []));
     };
     
+    
+    /**
+     * Execute any deferred functions
+     *
+     * @param Mixed data
+     * @return Bottle
+     */
+    var resolve = function resolve(data) {
+        get(deferred, this.id, '__global__').forEach(function deferredIterator(func) {
+            func(data);
+        });
+    
+        return this;
+    };
+    
     /**
      * Map used to inject dependencies in the generic factory;
      *
@@ -355,10 +402,13 @@
     Bottle.prototype = {
         constant : constant,
         decorator : decorator,
+        defer : defer,
+        digest : digest,
         factory : factory,
         middleware : middleware,
         provider : provider,
         register : register,
+        resolve : resolve,
         service : service,
         value : value
     };
