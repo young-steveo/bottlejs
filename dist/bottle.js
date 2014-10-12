@@ -1,7 +1,7 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v0.4.2 - 2014-10-02
+     * BottleJS v0.4.2 - 2014-10-07
      * A powerful, extensible dependency injection micro container
      *
      * Copyright (c) 2014 Stephen Young
@@ -274,6 +274,21 @@
     };
     
     /**
+     * Register a service, factory, provider, or value based on properties on the object.
+     *
+     * properties:
+     *  * Obj.$name   String required ex: `'Thing'`
+     *  * Obj.$type   String optional 'service', 'factory', 'provider', 'value'.  Default: 'service'
+     *  * Obj.$inject Mixed  optional only useful with $type 'service' name or array of names
+     *
+     * @param Function Obj
+     * @return Bottle
+     */
+    var register = function register(Obj) {
+        return this[Obj.$type || 'service'].apply(this, [Obj.$name, Obj].concat(Obj.$inject || []));
+    };
+    
+    /**
      * Map used to inject dependencies in the generic factory;
      *
      * @param String key
@@ -343,6 +358,7 @@
         factory : factory,
         middleware : middleware,
         provider : provider,
+        register : register,
         service : service,
         value : value
     };

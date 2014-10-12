@@ -204,6 +204,14 @@ Param                      | Type       | Details
 **name**<br />*(optional)* | *String*   | The name of the service this decorator will affect. Will run for all services if not passed.
 **func**                   | *Function* | A function that will accept the service as the first parameter.  Should return the service, or a new object to be used as the service.
 
+#### defer(func)
+
+Register a function to be executed only when `Bottle#resolve` is called.
+
+Param    | Type       | Details
+:--------|:-----------|:--------
+**func** | *Function* | A function to be called later.  Will be passed a value given to `Bottle#resolve`.
+
 #### digest(services)
 
 Immediately instantiate an array of services and return their instances
@@ -239,6 +247,22 @@ Param        | Type       | Details
 :------------|:-----------|:--------
 **name**     | *String*   | The name of the service.  Must be unique to each Bottle instance.
 **Provider** | *Function* | A constructor function that will be instantiated as a singleton.  Should expose a function called `$get` that will be used as a factory to instantiate the service.
+
+#### register(Obj)
+
+Used to register a service, factory, provider, or value based on properties of the Obj.
+
+Param   | Type       | Details
+:-------|:-----------|:--------
+**Obj** | *Object*\|*Function* | An object or constructor with one of several properties:<br /><ul><li>**Obj.$name** &mdash; *required* &mdash; the name used to register the object</li><li>**Obj.$type** &mdash; *optional* &mdash; the method used to register the object.  Defaults to `'service'` in which case the Obj will be treated as a constructor. Valid types are: `'service'`, `'factory'`, `'provider'`, `'value'`</li><li>**Obj.$inject** &mdash; *optional* &mdash; If `Obj.$type` is `'service'`, this property can be a string name or an array of names of dependencies to inject into the constructor.<br />E.g. `Obj.$inject = ['dep1', 'dep2'];`</li></ul>
+
+#### resolve(data)
+
+Execute any deferred functions registered by `Bottle#defer`.
+
+Param                      | Type    | Details
+:--------------------------|:--------|:--------
+**data**<br />*(optional)* | *Mixed* | Value to be passed to each deferred function as the first parameter.
 
 #### service(name, Constructor [, dependency [, ...]])
 
