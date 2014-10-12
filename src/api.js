@@ -19,12 +19,12 @@ var Bottle = function Bottle(name) {
 Bottle.prototype = {
     constant : constant,
     decorator : decorator,
+    digest : digest,
     factory : factory,
     middleware : middleware,
     provider : provider,
     service : service,
-    value : value,
-    digest : digest
+    value : value
 };
 
 /**

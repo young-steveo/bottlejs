@@ -3,10 +3,10 @@
     'use strict';
 
     /**
-     * Bottle Provider test suite
+     * Bottle Digest test suite
      */
     describe('Bottle#digest', function() {
-        it('will get an instance of all providers in the container', function() {
+        it('will get an instance of all services in the container', function() {
             var b = new Bottle();
             var thinga = function() { this.foo = 'a'; };
             var thingb = function() { this.foo = 'b'; };
@@ -19,7 +19,7 @@
             expect(results[1].foo).toBeDefined();
             expect(results[1].foo).toBe('b');
         });
-        it('will get an instance of all providers in the container in the correct order', function() {
+        it('will get an instance of all services in the container in the correct order', function() {
             var b = new Bottle();
             var thinga = function() { this.foo = 'a'; };
             var thingb = function() { this.foo = 'b'; };
