@@ -9,7 +9,5 @@ var getProvider = function(provider) {
  * @return array Array of instances (in the order they were provided)
  */
 var digest = function digest(providers) {
-    providers = providers || [];
-
-    return providers.map(getProvider, this);
+    return (providers || []).map(getProvider, this);
 };
