@@ -204,6 +204,15 @@ Param                      | Type       | Details
 **name**<br />*(optional)* | *String*   | The name of the service this decorator will affect. Will run for all services if not passed.
 **func**                   | *Function* | A function that will accept the service as the first parameter.  Should return the service, or a new object to be used as the service.
 
+#### digest(services)
+
+Immediately instantiate an array of services and return their instances
+in the order of the array of instances.
+
+Param        | Type    | Details
+:------------|:--------|:--------
+**services** | *Array* | Array of services that should be instantiated.
+
 #### factory(name, Factory)
 
 Used to register a service factory
@@ -249,12 +258,3 @@ Param    | Type     | Details
 :--------|:---------|:--------
 **name** | *String* | The name of the value.  Must be unique to each Bottle instance.
 **val**  | *Mixed*  | A value that will be defined as enumerable, but not writable.
-
-#### digest(services)
-
-Immediately instantiate an array of services and return their instances
-in the order of the array of instances.
-
-Param        | Type    | Details
-:------------|:--------|:--------
-**services** | *Array* | Array of services that should be instantiated.
