@@ -10,7 +10,7 @@ var Bottle = function Bottle(name) {
     }
 
     this.id = id++;
-    this.container = {};
+    this.container = { $register : register.bind(this) };
 };
 
 /**
