@@ -249,8 +249,9 @@ Param        | Type       | Details
 **Provider** | *Function* | A constructor function that will be instantiated as a singleton.  Should expose a function called `$get` that will be used as a factory to instantiate the service.
 
 #### register(Obj)
+#### container.$register(Obj)
 
-Used to register a service, factory, provider, or value based on properties of the Obj.
+Used to register a service, factory, provider, or value based on properties of the Obj.  `bottle.container.$register` is an alias of `bottle.register`; this allows factories and providers to register multiple services on the container without needing access to the bottle instance itself.
 
 Param   | Type       | Details
 :-------|:-----------|:--------
