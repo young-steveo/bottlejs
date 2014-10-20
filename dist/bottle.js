@@ -1,7 +1,7 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v0.5.0 - 2014-10-12
+     * BottleJS v0.6.0 - 2014-10-19
      * A powerful, extensible dependency injection micro container
      *
      * Copyright (c) 2014 Stephen Young
@@ -393,7 +393,7 @@
         }
     
         this.id = id++;
-        this.container = {};
+        this.container = { $register : register.bind(this) };
     };
     
     /**
