@@ -165,7 +165,7 @@ bottle.middleware(function(service, next) {
     next();
 });
 
-bottle.decorator('Beer', function(beer, next) {
+bottle.middleware('Beer', function(beer, next) {
     // this middleware will only affect the Beer service.
     console.log('Beer?  Nice.  Tip your bartender...');
     next();
