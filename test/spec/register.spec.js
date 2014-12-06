@@ -84,6 +84,18 @@
             b.register(value);
             expect(b.value).toHaveBeenCalledWith('someValue', value);
         });
+        it('can nest definitions if dot notation is used', function() {
+            var b = new Bottle();
+            var ThingA = function() {};
+            var ThingB = function() {};
+            ThingA.$name = 'Util.ThingA';
+            ThingB.$name = 'Util.ThingB';
+
+            b.register(ThingA).register(ThingB);
+            expect(b.container.Util).toBeDefined();
+            expect(b.container.Util.ThingA instanceof ThingA).toBe(true);
+            expect(b.container.Util.ThingB instanceof ThingB).toBe(true);
+        });
     });
     describe('container#$register', function() {
         it('will register a service under the $name property', function() {

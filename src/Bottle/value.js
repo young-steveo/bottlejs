@@ -6,12 +6,38 @@
  * @return
  */
 var value = function value(name, val) {
-    Object.defineProperty(this.container, name, {
+    var parts;
+    parts = name.split('.');
+    name = parts.pop();
+    defineValue.call(parts.reduce(setValueObject, this.container), name, val);
+    return this;
+};
+
+/**
+ * Iterator for setting a plain object literal via defineValue
+ *
+ * @param Object container
+ * @param string name
+ */
+var setValueObject = function setValueObject(container, name) {
+    var newContainer = {};
+    defineValue.call(container, name, newContainer);
+    return newContainer;
+};
+
+/**
+ * Define a mutable property on the container.
+ *
+ * @param String name
+ * @param mixed val
+ * @return void
+ * @scope container
+ */
+var defineValue = function defineValue(name, val) {
+    Object.defineProperty(this, name, {
         configurable : true,
         enumerable : true,
         value : val,
         writable : true
     });
-
-    return this;
 };

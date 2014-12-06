@@ -29,5 +29,15 @@
             expect(b.container.Thing).toBeDefined();
             expect(spy).toHaveBeenCalledWith(b.container);
         });
+
+        it('will nest bottle containers if the service name uses dot notation', function() {
+            var b = new Bottle();
+            var Thing = function() {};
+            var ThingFactory = function() { return new Thing(); };
+            b.factory('Util.Thing', ThingFactory);
+            expect(b.container.Util).toBeDefined();
+            expect(b.container.Util.ThingProvider).toBeDefined();
+            expect(b.container.Util.Thing).toBeDefined();
+        });
     });
 }());

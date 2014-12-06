@@ -1,16 +1,16 @@
 /**
+ * Map of nested bottles by index => name
+ *
+ * @type Array
+ */
+var nestedBottles = [];
+
+/**
  * Map of provider constructors by index => name
  *
- * @type Object
+ * @type Array
  */
-var providers = [];
-
-var getProviders = function(id) {
-    if (!providers[id]) {
-        providers[id] = {};
-    }
-    return providers[id];
-};
+var providerMap = [];
 
 /**
  * Used to process decorators in the provider
@@ -26,21 +26,40 @@ var reducer = function reducer(instance, func) {
 /**
  * Register a provider.
  *
+ * @param String fullname
+ * @param Function Provider
+ * @return Bottle
+ */
+var provider = function provider(fullname, Provider) {
+    var parts, providers, name, id, factory;
+
+    id = this.id;
+    providers = get(providerMap, id);
+    if (providers[fullname]) {
+        return console.error(fullname + ' provider already registered.');
+    }
+    providers[fullname] = true;
+
+    parts = fullname.split('.');
+    name = parts.shift();
+    factory = parts.length ? createSubProvider : createProvider;
+
+    return factory.call(this, name, Provider, fullname, parts);
+};
+
+/**
+ * Create the provider properties on the container
+ *
+ * @param String fullname
  * @param String name
  * @param Function Provider
  * @return Bottle
  */
-var provider = function provider(name, Provider) {
-    var providerName, providers, properties, container, id;
+var createProvider = function createProvider(name, Provider) {
+    var providerName, properties, container, id;
 
     id = this.id;
-    providers = getProviders(id);
-    if (providers[name]) {
-        return console.error(name + ' provider already registered.');
-    }
-
     container = this.container;
-    providers[name] = Provider;
     providerName = name + 'Provider';
 
     properties = Object.create(null);
@@ -48,12 +67,9 @@ var provider = function provider(name, Provider) {
         configurable : true,
         enumerable : true,
         get : function getProvider() {
-            var Constructor = providers[name], instance;
-            if (Constructor) {
-                instance = new Constructor();
-                delete container[providerName];
-                container[providerName] = instance;
-            }
+            var instance = new Provider();
+            delete container[providerName];
+            container[providerName] = instance;
             return instance;
         }
     };
@@ -64,14 +80,12 @@ var provider = function provider(name, Provider) {
         get : function getService() {
             var provider = container[providerName];
             var instance;
-
             if (provider) {
                 delete container[providerName];
                 delete container[name];
 
                 // filter through decorators
-                instance = get(decorators, id, '__global__')
-                    .concat(get(decorators, id, name))
+                instance = getAllWithMapped(decorators, id, name)
                     .reduce(reducer, provider.$get(container));
             }
             return instance ? applyMiddleware(id, name, instance, container) : instance;
@@ -79,5 +93,32 @@ var provider = function provider(name, Provider) {
     };
 
     Object.defineProperties(container, properties);
+    return this;
+};
+
+/**
+ * Creates a bottle container on the current bottle container, and registers
+ * the provider under the sub container.
+ *
+ * @param String name
+ * @param Function Provider
+ * @param String fullname
+ * @param Array parts
+ * @return Bottle
+ */
+var createSubProvider = function createSubProvider(name, Provider, fullname, parts) {
+    var bottle, bottles, subname, id;
+
+    id = this.id;
+    bottles = get(nestedBottles, id);
+    bottle = bottles[name];
+    if (!bottle) {
+        this.container[name] = (bottle = bottles[name] = Bottle.pop()).container;
+    }
+    subname = parts.join('.');
+    bottle.provider(subname, Provider);
+
+    set(fullnameMap, bottle.id, subname, { fullname : fullname, id : id });
+
     return this;
 };

@@ -14,8 +14,8 @@ var middles = [];
  * @param Object container
  * @return void
  */
-var applyMiddleware = function(id, name, instance, container) {
-    var middleware = get(middles, id, '__global__').concat(get(middles, id, name));
+var applyMiddleware = function applyMiddleware(id, name, instance, container) {
+    var middleware = getAllWithMapped(middles, id, name);
     var descriptor = {
         configurable : true,
         enumerable : true
@@ -23,7 +23,7 @@ var applyMiddleware = function(id, name, instance, container) {
     if (middleware.length) {
         descriptor.get = function getWithMiddlewear() {
             var index = 0;
-            var next = function() {
+            var next = function nextMiddleware() {
                 if (middleware[index]) {
                     middleware[index++](instance, next);
                 }

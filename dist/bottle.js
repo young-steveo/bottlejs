@@ -1,7 +1,7 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v0.6.0 - 2014-10-19
+     * BottleJS v0.6.0 - 2014-12-06
      * A powerful, extensible dependency injection micro container
      *
      * Copyright (c) 2014 Stephen Young
@@ -23,6 +23,24 @@
     var slice = Array.prototype.slice;
     
     /**
+     * Map of fullnames by index => name
+     *
+     * @type Array
+     */
+    var fullnameMap = [];
+    
+    /**
+     * Iterator used to flatten arrays with reduce.
+     *
+     * @param Array a
+     * @param Array b
+     * @return Array
+     */
+    var concatIterator = function concatIterator(a, b) {
+        return a.concat(b);
+    };
+    
+    /**
      * Get a group (middleware, decorator, etc.) for this bottle instance and service name.
      *
      * @param Array collection
@@ -35,10 +53,47 @@
         if (!group) {
             group = collection[id] = {};
         }
-        if (!group[name]) {
+        if (name && !group[name]) {
             group[name] = [];
         }
-        return group[name];
+        return name ? group[name] : group;
+    };
+    
+    /**
+     * Will try to get all things from a collection by name, by __global__, and by mapped names.
+     *
+     * @param Array collection
+     * @param Number id
+     * @param String name
+     * @return Array
+     */
+    var getAllWithMapped = function(collection, id, name) {
+        return get(fullnameMap, id, name)
+            .map(getMapped.bind(null, collection))
+            .reduce(concatIterator, get(collection, id, name))
+            .concat(get(collection, id, '__global__'));
+    };
+    
+    /**
+     * Iterator used to get decorators from a map
+     *
+     * @param Array collection
+     * @param Object data
+     * @return Function
+     */
+    var getMapped = function getMapped(collection, data) {
+        return get(collection, data.id, data.fullname);
+    };
+    
+    /**
+     * Iterator used to walk down a nested object.
+     *
+     * @param Object obj
+     * @param String prop
+     * @return mixed
+     */
+    var getNested = function getNested(obj, prop) {
+        return obj[prop];
     };
     
     /**
@@ -64,14 +119,19 @@
      * @return Bottle
      */
     var constant = function constant(name, value) {
-        Object.defineProperty(this.container, name, {
+        var parts = name.split('.');
+        name = parts.pop();
+        defineConstant.call(parts.reduce(setValueObject, this.container), name, value);
+        return this;
+    };
+    
+    var defineConstant = function defineConstant(name, value) {
+        Object.defineProperty(this, name, {
             configurable : false,
             enumerable : true,
             value : value,
             writable : false
         });
-    
-        return this;
     };
     
     /**
@@ -111,18 +171,24 @@
         return this;
     };
     
-    var getService = function(service) {
-        return this.container[service];
+    /**
+     * Get a service stored under a nested key
+     *
+     * @param String fullname
+     * @return Service
+     */
+    var getNestedService = function getNestedService(fullname) {
+        return fullname.split('.').reduce(getNested, this);
     };
     
     /**
      * Immediately instantiates the provided list of services and returns them.
      *
-     * @param array services
-     * @return array Array of instances (in the order they were provided)
+     * @param Array services
+     * @return Array Array of instances (in the order they were provided)
      */
     var digest = function digest(services) {
-        return (services || []).map(getService, this);
+        return (services || []).map(getNestedService, this.container);
     };
     
     /**
@@ -154,8 +220,8 @@
      * @param Object container
      * @return void
      */
-    var applyMiddleware = function(id, name, instance, container) {
-        var middleware = get(middles, id, '__global__').concat(get(middles, id, name));
+    var applyMiddleware = function applyMiddleware(id, name, instance, container) {
+        var middleware = getAllWithMapped(middles, id, name);
         var descriptor = {
             configurable : true,
             enumerable : true
@@ -163,7 +229,7 @@
         if (middleware.length) {
             descriptor.get = function getWithMiddlewear() {
                 var index = 0;
-                var next = function() {
+                var next = function nextMiddleware() {
                     if (middleware[index]) {
                         middleware[index++](instance, next);
                     }
@@ -222,18 +288,18 @@
     };
     
     /**
+     * Map of nested bottles by index => name
+     *
+     * @type Array
+     */
+    var nestedBottles = [];
+    
+    /**
      * Map of provider constructors by index => name
      *
-     * @type Object
+     * @type Array
      */
-    var providers = [];
-    
-    var getProviders = function(id) {
-        if (!providers[id]) {
-            providers[id] = {};
-        }
-        return providers[id];
-    };
+    var providerMap = [];
     
     /**
      * Used to process decorators in the provider
@@ -249,21 +315,40 @@
     /**
      * Register a provider.
      *
+     * @param String fullname
+     * @param Function Provider
+     * @return Bottle
+     */
+    var provider = function provider(fullname, Provider) {
+        var parts, providers, name, id, factory;
+    
+        id = this.id;
+        providers = get(providerMap, id);
+        if (providers[fullname]) {
+            return console.error(fullname + ' provider already registered.');
+        }
+        providers[fullname] = true;
+    
+        parts = fullname.split('.');
+        name = parts.shift();
+        factory = parts.length ? createSubProvider : createProvider;
+    
+        return factory.call(this, name, Provider, fullname, parts);
+    };
+    
+    /**
+     * Create the provider properties on the container
+     *
+     * @param String fullname
      * @param String name
      * @param Function Provider
      * @return Bottle
      */
-    var provider = function provider(name, Provider) {
-        var providerName, providers, properties, container, id;
+    var createProvider = function createProvider(name, Provider) {
+        var providerName, properties, container, id;
     
         id = this.id;
-        providers = getProviders(id);
-        if (providers[name]) {
-            return console.error(name + ' provider already registered.');
-        }
-    
         container = this.container;
-        providers[name] = Provider;
         providerName = name + 'Provider';
     
         properties = Object.create(null);
@@ -271,12 +356,9 @@
             configurable : true,
             enumerable : true,
             get : function getProvider() {
-                var Constructor = providers[name], instance;
-                if (Constructor) {
-                    instance = new Constructor();
-                    delete container[providerName];
-                    container[providerName] = instance;
-                }
+                var instance = new Provider();
+                delete container[providerName];
+                container[providerName] = instance;
                 return instance;
             }
         };
@@ -287,14 +369,12 @@
             get : function getService() {
                 var provider = container[providerName];
                 var instance;
-    
                 if (provider) {
                     delete container[providerName];
                     delete container[name];
     
                     // filter through decorators
-                    instance = get(decorators, id, '__global__')
-                        .concat(get(decorators, id, name))
+                    instance = getAllWithMapped(decorators, id, name)
                         .reduce(reducer, provider.$get(container));
                 }
                 return instance ? applyMiddleware(id, name, instance, container) : instance;
@@ -302,6 +382,33 @@
         };
     
         Object.defineProperties(container, properties);
+        return this;
+    };
+    
+    /**
+     * Creates a bottle container on the current bottle container, and registers
+     * the provider under the sub container.
+     *
+     * @param String name
+     * @param Function Provider
+     * @param String fullname
+     * @param Array parts
+     * @return Bottle
+     */
+    var createSubProvider = function createSubProvider(name, Provider, fullname, parts) {
+        var bottle, bottles, subname, id;
+    
+        id = this.id;
+        bottles = get(nestedBottles, id);
+        bottle = bottles[name];
+        if (!bottle) {
+            this.container[name] = (bottle = bottles[name] = Bottle.pop()).container;
+        }
+        subname = parts.join('.');
+        bottle.provider(subname, Provider);
+    
+        set(fullnameMap, bottle.id, subname, { fullname : fullname, id : id });
+    
         return this;
     };
     
@@ -336,16 +443,6 @@
     };
     
     /**
-     * Map used to inject dependencies in the generic factory;
-     *
-     * @param String key
-     * @return mixed
-     */
-    var mapContainer = function mapContainer(key) {
-        return this.container[key];
-    };
-    
-    /**
      * Register a service inside a generic factory.
      *
      * @param String name
@@ -355,9 +452,9 @@
     var service = function service(name, Service) {
         var deps = arguments.length > 2 ? slice.call(arguments, 1) : null;
         var bottle = this;
-        return factory.call(bottle, name, function GenericFactory() {
+        return factory.call(this, name, function GenericFactory() {
             if (deps) {
-                Service = Service.bind.apply(Service, deps.map(mapContainer, bottle));
+                Service = Service.bind.apply(Service, deps.map(getNested.bind(bottle, bottle.container)));
             }
             return new Service();
         });
@@ -371,14 +468,40 @@
      * @return
      */
     var value = function value(name, val) {
-        Object.defineProperty(this.container, name, {
+        var parts;
+        parts = name.split('.');
+        name = parts.pop();
+        defineValue.call(parts.reduce(setValueObject, this.container), name, val);
+        return this;
+    };
+    
+    /**
+     * Iterator for setting a plain object literal via defineValue
+     *
+     * @param Object container
+     * @param string name
+     */
+    var setValueObject = function setValueObject(container, name) {
+        var newContainer = {};
+        defineValue.call(container, name, newContainer);
+        return newContainer;
+    };
+    
+    /**
+     * Define a mutable property on the container.
+     *
+     * @param String name
+     * @param mixed val
+     * @return void
+     * @scope container
+     */
+    var defineValue = function defineValue(name, val) {
+        Object.defineProperty(this, name, {
             configurable : true,
             enumerable : true,
             value : val,
             writable : true
         });
-    
-        return this;
     };
     
     

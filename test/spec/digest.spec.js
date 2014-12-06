@@ -32,5 +32,14 @@
             expect(results[1].foo).toBeDefined();
             expect(results[1].foo).toBe('a');
         });
+        it('can digest dot notation strings', function() {
+            var b = new Bottle();
+            var Thing = function() { this.foo = 'c'; };
+            var results;
+            b.service('Util.Thing', Thing);
+            results = b.digest(['Util.Thing']);
+            expect(results[0].foo).toBeDefined();
+            expect(results[0].foo).toBe('c');
+        });
     });
 }());

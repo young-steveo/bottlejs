@@ -21,5 +21,12 @@
             delete container.mutable;
             expect(container.mutable).not.toBeDefined();
         });
+
+        it('will nest bottle containers if the value name uses dot notation', function() {
+            var b = new Bottle();
+            b.value('nested.thing', '123');
+            expect(b.container.nested).toBeDefined();
+            expect(b.container.nested.thing).toBe('123');
+        });
     });
 }());

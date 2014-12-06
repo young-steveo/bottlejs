@@ -38,5 +38,14 @@
             expect(b.container.Thing.foo.name).toBe('foo');
             expect(b.container.Thing.bar).toBe('bippity');
         });
+
+        it('will nest bottle containers if the service name uses dot notation', function() {
+            var b = new Bottle();
+            var Thing = function() {};
+            b.service('Util.Thing', Thing);
+            expect(b.container.Util).toBeDefined();
+            expect(b.container.Util.ThingProvider).toBeDefined();
+            expect(b.container.Util.Thing).toBeDefined();
+        });
     });
 }());
