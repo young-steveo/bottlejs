@@ -41,5 +41,15 @@
             expect(b.container.Thing1.name).toBe('Changed');
             expect(b.container.Thing2.name).toBe('Changed');
         });
+
+        it('can handle dot notation keys', function() {
+            var b = new Bottle();
+            b.service('Util.Thing', function() { this.name = 'Util Thing'; });
+            b.middleware('Util.Thing', function(service, next) {
+                service.name = 'Middleware Thing';
+                next();
+            });
+            expect(b.container.Util.Thing.name).toBe('Middleware Thing');
+        });
     });
 }());

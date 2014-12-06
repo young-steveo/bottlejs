@@ -29,5 +29,15 @@
             expect(b.container.Thing.name).toBe('FooBar');
             expect(b.container.Prop.name).toBe('Prop');
         });
+
+        it('can handle dot notation keys', function() {
+            var b = new Bottle();
+            b.service('Util.Thing', function() { this.name = 'Util Thing'; });
+            b.decorator('Util.Thing', function(Service) {
+                Service.name = 'Util FooBar';
+                return Service;
+            });
+            expect(b.container.Util.Thing.name).toBe('Util FooBar');
+        });
     });
 }());

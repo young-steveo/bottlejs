@@ -14,6 +14,24 @@ var id = 0;
 var slice = Array.prototype.slice;
 
 /**
+ * Map of fullnames by index => name
+ *
+ * @type Array
+ */
+var fullnameMap = [];
+
+/**
+ * Iterator used to flatten arrays with reduce.
+ *
+ * @param Array a
+ * @param Array b
+ * @return Array
+ */
+var concatIterator = function concatIterator(a, b) {
+    return a.concat(b);
+};
+
+/**
  * Get a group (middleware, decorator, etc.) for this bottle instance and service name.
  *
  * @param Array collection
@@ -26,10 +44,47 @@ var get = function get(collection, id, name) {
     if (!group) {
         group = collection[id] = {};
     }
-    if (!group[name]) {
+    if (name && !group[name]) {
         group[name] = [];
     }
-    return group[name];
+    return name ? group[name] : group;
+};
+
+/**
+ * Will try to get all things from a collection by name, by __global__, and by mapped names.
+ *
+ * @param Array collection
+ * @param Number id
+ * @param String name
+ * @return Array
+ */
+var getAllWithMapped = function(collection, id, name) {
+    return get(fullnameMap, id, name)
+        .map(getMapped.bind(null, collection))
+        .reduce(concatIterator, get(collection, id, name))
+        .concat(get(collection, id, '__global__'));
+};
+
+/**
+ * Iterator used to get decorators from a map
+ *
+ * @param Array collection
+ * @param Object data
+ * @return Function
+ */
+var getMapped = function getMapped(collection, data) {
+    return get(collection, data.id, data.fullname);
+};
+
+/**
+ * Iterator used to walk down a nested object.
+ *
+ * @param Object obj
+ * @param String prop
+ * @return mixed
+ */
+var getNested = function getNested(obj, prop) {
+    return obj[prop];
 };
 
 /**
