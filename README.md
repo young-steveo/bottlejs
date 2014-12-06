@@ -172,6 +172,17 @@ bottle.middleware('Beer', function(beer, next) {
 });
 ```
 
+## Nested Bottles
+Bottle will generate nested containers if dot notation is used in the service name.  A sub container will be created for you based on the name given:
+
+```js
+var bottle = new Bottle();
+var IPA = function() {};
+bottle.service('Beer.IPA', IPA);
+bottle.container.Beer; // this is a new Bottle.container object
+bottle.container.Beer.IPA; // the service
+```
+
 ## API
 
 ### Bottle
