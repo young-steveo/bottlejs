@@ -1,7 +1,7 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v0.7.1 - 2014-12-06
+     * BottleJS v0.7.2 - 2014-12-26
      * A powerful, extensible dependency injection micro container
      *
      * Copyright (c) 2014 Stephen Young
@@ -97,6 +97,16 @@
     };
     
     /**
+     * Get a service stored under a nested key
+     *
+     * @param String fullname
+     * @return Service
+     */
+    var getNestedService = function getNestedService(fullname) {
+        return fullname.split('.').reduce(getNested, this);
+    };
+    
+    /**
      * A helper function for pushing middleware and decorators onto their stacks.
      *
      * @param Array collection
@@ -171,15 +181,6 @@
         return this;
     };
     
-    /**
-     * Get a service stored under a nested key
-     *
-     * @param String fullname
-     * @return Service
-     */
-    var getNestedService = function getNestedService(fullname) {
-        return fullname.split('.').reduce(getNested, this);
-    };
     
     /**
      * Immediately instantiates the provided list of services and returns them.
@@ -450,11 +451,13 @@
      * @return Bottle
      */
     var service = function service(name, Service) {
-        var deps = arguments.length > 2 ? slice.call(arguments, 1) : null;
+        var deps = arguments.length > 2 ? slice.call(arguments, 2) : null;
         var bottle = this;
         return factory.call(this, name, function GenericFactory() {
             if (deps) {
-                Service = Service.bind.apply(Service, deps.map(getNested.bind(bottle, bottle.container)));
+                deps = deps.map(getNestedService, bottle.container);
+                deps.unshift(Service);
+                Service = Service.bind.apply(Service, deps);
             }
             return new Service();
         });
