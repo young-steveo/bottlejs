@@ -1,12 +1,3 @@
-/**
- * Get a service stored under a nested key
- *
- * @param String fullname
- * @return Service
- */
-var getNestedService = function getNestedService(fullname) {
-    return fullname.split('.').reduce(getNested, this);
-};
 
 /**
  * Immediately instantiates the provided list of services and returns them.
