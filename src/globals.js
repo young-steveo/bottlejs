@@ -88,6 +88,16 @@ var getNested = function getNested(obj, prop) {
 };
 
 /**
+ * Get a service stored under a nested key
+ *
+ * @param String fullname
+ * @return Service
+ */
+var getNestedService = function getNestedService(fullname) {
+    return fullname.split('.').reduce(getNested, this);
+};
+
+/**
  * A helper function for pushing middleware and decorators onto their stacks.
  *
  * @param Array collection

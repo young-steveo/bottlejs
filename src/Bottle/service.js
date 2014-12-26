@@ -6,11 +6,13 @@
  * @return Bottle
  */
 var service = function service(name, Service) {
-    var deps = arguments.length > 2 ? slice.call(arguments, 1) : null;
+    var deps = arguments.length > 2 ? slice.call(arguments, 2) : null;
     var bottle = this;
     return factory.call(this, name, function GenericFactory() {
         if (deps) {
-            Service = Service.bind.apply(Service, deps.map(getNested.bind(bottle, bottle.container)));
+            deps = deps.map(getNestedService, bottle.container);
+            deps.unshift(Service);
+            Service = Service.bind.apply(Service, deps);
         }
         return new Service();
     });

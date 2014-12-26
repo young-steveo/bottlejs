@@ -47,5 +47,15 @@
             expect(b.container.Util.ThingProvider).toBeDefined();
             expect(b.container.Util.Thing).toBeDefined();
         });
+
+        it('can resolve dot-notation dependencies', function() {
+            var b = new Bottle();
+            var Thing = function(sub) { this.sub = sub; };
+            var SubThing = function() {};
+            b.service('Thing', Thing, 'Nest.SubThing');
+            b.service('Nest.SubThing', SubThing);
+            expect(b.container.Thing.sub).toBeDefined();
+            expect(b.container.Thing.sub instanceof SubThing).toBe(true);
+        });
     });
 }());
