@@ -1,5 +1,5 @@
 /* globals Bottle */
-;(function() {
+;(function(undefined) {
     'use strict';
 
     /**
@@ -16,6 +16,14 @@
             expect(Bottle.pop('Soda')).toBe(Bottle.pop('Soda'));
             expect(Bottle.pop('Pop')).toBe(Bottle.pop('Pop'));
             expect(Bottle.pop('Soda')).not.toBe(Bottle.pop('Pop'));
+        });
+        it('will not have name if not passed a name parameter', function() {
+            var bottle = Bottle.pop();
+            expect(bottle.container.BOTTLE_NAME).toBe(undefined);
+        });
+        it('will make the instance name available when a name is passed', function() {
+            var bottle = Bottle.pop('Soda');
+            expect(bottle.container.BOTTLE_NAME).toBe('Soda');
         });
     });
 }());

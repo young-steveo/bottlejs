@@ -20,6 +20,7 @@ var pop = function pop(name) {
         instance = bottles[name];
         if (!instance) {
             bottles[name] = instance = new Bottle();
+            instance.constant('BOTTLE_NAME', name);
         }
         return instance;
     }
