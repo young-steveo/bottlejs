@@ -193,7 +193,7 @@ Used to get an instance of bottle.  If a name is passed, bottle will return the 
 
 Param                      | Type       | Details
 :--------------------------|:-----------|:--------
-**name**<br />*(optional)* | The name of the bottle. If passed, bottle will store the instance internally and return the same instance if `Bottle.pop` is subsequently called with the same name.
+**name**<br />*(optional)* | *String*   | The name of the bottle. If passed, bottle will store the instance internally and return the same instance if `Bottle.pop` is subsequently called with the same name.
 
 ### Bottle.prototype
 
