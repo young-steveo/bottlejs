@@ -1,10 +1,10 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v0.7.2 - 2014-12-26
-     * A powerful, extensible dependency injection micro container
+     * BottleJS v1.0.0 - 2015-05-25
+     * A powerful dependency injection micro container
      *
-     * Copyright (c) 2014 Stephen Young
+     * Copyright (c) 2015 Stephen Young
      * Licensed MIT
      */
     
@@ -282,6 +282,7 @@
             instance = bottles[name];
             if (!instance) {
                 bottles[name] = instance = new Bottle();
+                instance.constant('BOTTLE_NAME', name);
             }
             return instance;
         }

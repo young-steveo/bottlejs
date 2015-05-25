@@ -2,11 +2,11 @@
 ![BottleJS](/bottle-logo.jpg)
 # BottleJS [![Build Status](https://travis-ci.org/young-steveo/bottlejs.svg?branch=master)](https://travis-ci.org/young-steveo/bottlejs)
 
-> A powerful, extensible dependency injection micro container
+> A powerful dependency injection micro container
 
 ## Introduction
 
-BottleJS is a tiny yet powerful dependency injection container.  It features lazy loading, middleware hooks, decorators and a clean api inspired by the [AngularJS Module API](https://docs.angularjs.org/api/ng/type/angular.Module) and the simple PHP library [Pimple](http://pimple.sensiolabs.org/).  You'll like BottleJS if you enjoy:
+BottleJS is a tiny, powerful dependency injection container.  It features lazy loading, middleware hooks, decorators and a clean api inspired by the [AngularJS Module API](https://docs.angularjs.org/api/ng/type/angular.Module) and the simple PHP library [Pimple](http://pimple.sensiolabs.org/).  You'll like BottleJS if you enjoy:
 
 * building a stack from components rather than a kitchen-sink framework.
 * uncoupled objects and dependency injection.
@@ -189,11 +189,11 @@ bottle.container.Beer.IPA; // the service
 
 #### pop([name])
 
-Used to get an instance of bottle.  If a name is passed, bottle will return the same instance.  Calling the Bottle constructor as a function will call and return return `Bottle.pop`, so `Bottle.pop('Soda') === Bottle('pop')`
+Used to get an instance of bottle.  If a name is passed, bottle will return the same instance.  Calling the Bottle constructor as a function will call and return return `Bottle.pop`, so `Bottle.pop('Soda') === Bottle('Soda')`
 
 Param                      | Type       | Details
 :--------------------------|:-----------|:--------
-**name**<br />*(optional)* | The name of the bottle. If passed, bottle will store the instance internally and return the same instance if `Bottle.pop` is subsequently called with the same name.
+**name**<br />*(optional)* | *String*   | The name of the bottle. If passed, bottle will store the instance internally and return the same instance if `Bottle.pop` is subsequently called with the same name.
 
 ### Bottle.prototype
 
@@ -217,7 +217,7 @@ Param                      | Type       | Details
 
 #### defer(func)
 
-Register a function to be executed only when `Bottle#resolve` is called.
+Register a function to be executed when `Bottle#resolve` is called.
 
 Param    | Type       | Details
 :--------|:-----------|:--------
