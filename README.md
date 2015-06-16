@@ -59,7 +59,7 @@ A lot happened behind the scenes:
 
 ## Injecting Dependencies
 
-The above example is simple.  But, what if the Beer service had dependencies?  For eample:
+The above example is simple.  But, what if the Beer service had dependencies?  For example:
 
 ```js
 var Barley = function() {};
