@@ -1,7 +1,7 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v1.0.0 - 2015-05-25
+     * BottleJS v1.0.1 - 2015-10-05
      * A powerful dependency injection micro container
      *
      * Copyright (c) 2015 Stephen Young
@@ -379,7 +379,7 @@
                     instance = getAllWithMapped(decorators, id, name)
                         .reduce(reducer, provider.$get(container));
                 }
-                return instance ? applyMiddleware(id, name, instance, container) : instance;
+                return instance === undefined ? instance : applyMiddleware(id, name, instance, container);
             }
         };
     
