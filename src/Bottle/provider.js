@@ -88,7 +88,7 @@ var createProvider = function createProvider(name, Provider) {
                 instance = getAllWithMapped(decorators, id, name)
                     .reduce(reducer, provider.$get(container));
             }
-            return instance ? applyMiddleware(id, name, instance, container) : instance;
+            return instance === undefined ? instance : applyMiddleware(id, name, instance, container);
         }
     };
 

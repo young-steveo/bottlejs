@@ -72,5 +72,27 @@
             expect(b.container.Util.ThingProvider).toBeDefined();
             expect(b.container.Util.Thing).toBeDefined();
         });
+
+        it('Allows falsey values returned by $get to remain defined when accessed multiple times', function() {
+            var b = new Bottle();
+            var NullyProvider = function() { this.$get = function() { return null; }; };
+            var EmptyProvider = function() { this.$get = function() { return ''; }; };
+            var FalseyProvider = function() { this.$get = function() { return false; }; };
+            var ZeroProvider = function() { this.$get = function() { return 0; }; };
+
+            b.provider('Nully', NullyProvider);
+            b.provider('Empty', EmptyProvider);
+            b.provider('Falsey', FalseyProvider);
+            b.provider('Zero', ZeroProvider);
+
+            expect(b.container.Nully).toBe(null);
+            expect(b.container.Nully).toBe(null);
+            expect(b.container.Empty).toBe('');
+            expect(b.container.Empty).toBe('');
+            expect(b.container.Falsey).toBe(false);
+            expect(b.container.Falsey).toBe(false);
+            expect(b.container.Zero).toBe(0);
+            expect(b.container.Zero).toBe(0);
+        });
     });
 }());
