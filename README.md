@@ -75,7 +75,7 @@ var bottle = new Bottle();
 bottle.service('Barley', Barley);
 bottle.service('Hops', Hops);
 bottle.service('Water', Water);
-bottle.service('Beer', Beer, 'Barley', 'Hops', 'Water');
+bottle.service('Beer', Beer);
 ```
 
 Now, when you access `bottle.container.Beer`, Bottle will lazily load all of the dependencies and inject them into your Beer service before returning it.

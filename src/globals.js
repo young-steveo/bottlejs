@@ -111,3 +111,23 @@ var set = function set(collection, id, name, func) {
     }
     get(collection, id, name).push(func);
 };
+
+var mergeArray = function mergeArray(source, target) {
+    source.forEach(function (item, index) {
+        target[index] = item;
+    });
+    return target;
+};
+
+// https://github.com/sindresorhus/fn-args/blob/master/index.js
+var fnArgs = function fnArgs(fn) {
+    if (fn.length === 0) {
+        return [];
+    }
+    var reComments = /(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/mg;
+    var reFnArgs = /^function\s*[^(]*\(([^)]+)\)/;
+    var match = reFnArgs.exec(fn.toString().replace(reComments, ''));
+    return match ? match[1].split(',').map(function (el) {
+        return el.trim();
+    }) : [];
+};
