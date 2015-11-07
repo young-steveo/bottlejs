@@ -51,5 +51,16 @@
             });
             expect(b.container.Util.Thing.name).toBe('Middleware Thing');
         });
+
+        it('throw error when next(err)', function() {
+            var b = new Bottle();
+            b.service('Thing', function() { this.name = 'Thing'; });
+            b.middleware('Thing', function(service, next) {
+                next(new Error('Thing error'));
+            });
+            expect(function () {
+                expect(b.container.Thing.name).toBe('Thing');
+            }).toThrow(new Error('Thing error'));
+        });
     });
 }());

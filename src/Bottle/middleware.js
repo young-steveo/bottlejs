@@ -23,7 +23,10 @@ var applyMiddleware = function applyMiddleware(id, name, instance, container) {
     if (middleware.length) {
         descriptor.get = function getWithMiddlewear() {
             var index = 0;
-            var next = function nextMiddleware() {
+            var next = function nextMiddleware(err) {
+                if (err) {
+                    throw err;
+                }
                 if (middleware[index]) {
                     middleware[index++](instance, next);
                 }
