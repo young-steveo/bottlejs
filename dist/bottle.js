@@ -1,7 +1,7 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v1.0.1 - 2015-10-05
+     * BottleJS v1.1.0 - 2015-11-09
      * A powerful dependency injection micro container
      *
      * Copyright (c) 2015 Stephen Young
@@ -230,7 +230,10 @@
         if (middleware.length) {
             descriptor.get = function getWithMiddlewear() {
                 var index = 0;
-                var next = function nextMiddleware() {
+                var next = function nextMiddleware(err) {
+                    if (err) {
+                        throw err;
+                    }
                     if (middleware[index]) {
                         middleware[index++](instance, next);
                     }
