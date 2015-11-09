@@ -96,6 +96,19 @@
             expect(b.container.Util.ThingA instanceof ThingA).toBe(true);
             expect(b.container.Util.ThingB instanceof ThingB).toBe(true);
         });
+        it('supports the $value property', function() {
+            var b = new Bottle();
+            var value = {};
+            var config = {
+                $name : 'someValue',
+                $type : 'value',
+                $value : value
+            };
+            spyOn(b, 'value');
+            b.register(config);
+            expect(b.value).toHaveBeenCalledWith('someValue', value);
+            expect(b.someValue === value);
+        });
     });
     describe('container#$register', function() {
         it('will register a service under the $name property', function() {
