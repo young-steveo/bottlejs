@@ -1,7 +1,7 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v1.0.1 - 2015-10-05
+     * BottleJS v1.1.0 - 2015-11-09
      * A powerful dependency injection micro container
      *
      * Copyright (c) 2015 Stephen Young
@@ -230,7 +230,10 @@
         if (middleware.length) {
             descriptor.get = function getWithMiddlewear() {
                 var index = 0;
-                var next = function nextMiddleware() {
+                var next = function nextMiddleware(err) {
+                    if (err) {
+                        throw err;
+                    }
                     if (middleware[index]) {
                         middleware[index++](instance, next);
                     }
@@ -421,12 +424,17 @@
      *  * Obj.$name   String required ex: `'Thing'`
      *  * Obj.$type   String optional 'service', 'factory', 'provider', 'value'.  Default: 'service'
      *  * Obj.$inject Mixed  optional only useful with $type 'service' name or array of names
+     *  * Obj.$value  Mixed  optional Normally Obj is registered on the container.  However, if this
+     *                       property is included, it's value will be registered on the container
+     *                       instead of the object itsself.  Useful for registering objects on the
+     *                       bottle container without modifying those objects with bottle specific keys.
      *
      * @param Function Obj
      * @return Bottle
      */
     var register = function register(Obj) {
-        return this[Obj.$type || 'service'].apply(this, [Obj.$name, Obj].concat(Obj.$inject || []));
+        var value = Obj.$value === undefined ? Obj : Obj.$value;
+        return this[Obj.$type || 'service'].apply(this, [Obj.$name, value].concat(Obj.$inject || []));
     };
     
     

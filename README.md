@@ -172,6 +172,21 @@ bottle.middleware('Beer', function(beer, next) {
 });
 ```
 
+Middleware can pass an error object to the `next` function, and bottle will throw the error:
+
+```js
+var bottle = new Bottle();
+bottle.service('Beer', Beer);
+bottle.middleware('Beer', function(beer, next) {
+    if (beer.hasGoneBad()) {
+        return next(new Error('The Beer has gone bad!'));
+    }
+    next();
+});
+
+// results in Uncaught Error: The Beer has gone bad!(…)
+```
+
 ## Nested Bottles
 Bottle will generate nested containers if dot notation is used in the service name.  A sub container will be created for you based on the name given:
 
@@ -248,7 +263,7 @@ Used to register a middleware function.  This function will be executed every ti
 Param                      | Type       | Details
 :--------------------------|:-----------|:--------
 **name**<br />*(optional)* | *String*   | The name of the service for which this middleware will be called. Will run for all services if not passed.
-**func**                   | *Function* | A function that will accept the service as the first parameter, and a `next` function as the second parameter.  Should execute `next()` to allow other middleware in the stack to execute.
+**func**                   | *Function* | A function that will accept the service as the first parameter, and a `next` function as the second parameter.  Should execute `next()` to allow other middleware in the stack to execute.  Bottle will throw anything passed to the `next` function, i.e. `next(new Error('error msg'))`.
 
 #### provider(name, Provider)
 
@@ -266,7 +281,7 @@ Used to register a service, factory, provider, or value based on properties of t
 
 Param   | Type       | Details
 :-------|:-----------|:--------
-**Obj** | *Object*\|*Function* | An object or constructor with one of several properties:<br /><ul><li>**Obj.$name** &mdash; *required* &mdash; the name used to register the object</li><li>**Obj.$type** &mdash; *optional* &mdash; the method used to register the object.  Defaults to `'service'` in which case the Obj will be treated as a constructor. Valid types are: `'service'`, `'factory'`, `'provider'`, `'value'`</li><li>**Obj.$inject** &mdash; *optional* &mdash; If `Obj.$type` is `'service'`, this property can be a string name or an array of names of dependencies to inject into the constructor.<br />E.g. `Obj.$inject = ['dep1', 'dep2'];`</li></ul>
+**Obj** | *Object*\|*Function* | An object or constructor with one of several properties:<br /><ul><li>**Obj.$name** &mdash; *required* &mdash; the name used to register the object</li><li>**Obj.$type** &mdash; *optional* &mdash; the method used to register the object.  Defaults to `'service'` in which case the Obj will be treated as a constructor. Valid types are: `'service'`, `'factory'`, `'provider'`, `'value'`</li><li>**Obj.$inject** &mdash; *optional* &mdash; If `Obj.$type` is `'service'`, this property can be a string name or an array of names of dependencies to inject into the constructor.<br />E.g. `Obj.$inject = ['dep1', 'dep2'];`</li><li>**Obj.$value** &mdash; *optional* &mdash; Normally Obj is registered on the container.  However, if this property is included, it's value will be registered on the container instead of the object itself.  Useful for registering objects on the bottle container without modifying those objects with bottle specific keys.</li></ul>
 
 #### resolve(data)
 
