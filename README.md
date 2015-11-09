@@ -263,7 +263,7 @@ Used to register a middleware function.  This function will be executed every ti
 Param                      | Type       | Details
 :--------------------------|:-----------|:--------
 **name**<br />*(optional)* | *String*   | The name of the service for which this middleware will be called. Will run for all services if not passed.
-**func**                   | *Function* | A function that will accept the service as the first parameter, and a `next` function as the second parameter.  Should execute `next()` to allow other middleware in the stack to execute.
+**func**                   | *Function* | A function that will accept the service as the first parameter, and a `next` function as the second parameter.  Should execute `next()` to allow other middleware in the stack to execute.  Bottle will throw anything passwed to the `next` function, i.e. `next(new Error('error msg'))`.
 
 #### provider(name, Provider)
 
