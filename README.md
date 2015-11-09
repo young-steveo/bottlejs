@@ -172,6 +172,21 @@ bottle.middleware('Beer', function(beer, next) {
 });
 ```
 
+Middleware can pass an error object to the `next` function, and bottle will throw the error:
+
+```js
+var bottle = new Bottle();
+bottle.service('Beer', Beer);
+bottle.middleware('Beer', function(beer, next) {
+    if (beer.hasGoneBad()) {
+        return next(new Error('The Beer has gone bad!'));
+    }
+    next();
+});
+
+// results in Uncaught Error: The Beer has gone bad!(…)
+```
+
 ## Nested Bottles
 Bottle will generate nested containers if dot notation is used in the service name.  A sub container will be created for you based on the name given:
 
