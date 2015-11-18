@@ -28,5 +28,14 @@
             expect(b.container.nested).toBeDefined();
             expect(b.container.nested.thing).toBe('123');
         });
+
+        it('will not overwrite nested bottle containers when nested syntax is used', function() {
+            var b = new Bottle();
+            b.value('nested.thingOne', '123');
+            b.value('nested.thingTwo', 'abc');
+            expect(b.container.nested).toBeDefined();
+            expect(b.container.nested.thingOne).toBe('123');
+            expect(b.container.nested.thingTwo).toBe('abc');
+        });
     });
 }());
