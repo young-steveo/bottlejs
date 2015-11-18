@@ -20,9 +20,12 @@ var value = function value(name, val) {
  * @param string name
  */
 var setValueObject = function setValueObject(container, name) {
-    var newContainer = {};
-    defineValue.call(container, name, newContainer);
-    return newContainer;
+    var nestedContainer = container[name];
+    if (!container[name]) {
+        nestedContainer = {};
+        defineValue.call(container, name, nestedContainer);
+    }
+    return nestedContainer;
 };
 
 /**
