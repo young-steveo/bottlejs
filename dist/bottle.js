@@ -1,7 +1,7 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v1.1.0 - 2015-11-09
+     * BottleJS v1.1.1 - 2015-11-18
      * A powerful dependency injection micro container
      *
      * Copyright (c) 2015 Stephen Young
@@ -494,9 +494,12 @@
      * @param string name
      */
     var setValueObject = function setValueObject(container, name) {
-        var newContainer = {};
-        defineValue.call(container, name, newContainer);
-        return newContainer;
+        var nestedContainer = container[name];
+        if (!nestedContainer) {
+            nestedContainer = {};
+            defineValue.call(container, name, nestedContainer);
+        }
+        return nestedContainer;
     };
     
     /**
