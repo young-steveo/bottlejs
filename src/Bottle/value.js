@@ -21,7 +21,7 @@ var value = function value(name, val) {
  */
 var setValueObject = function setValueObject(container, name) {
     var nestedContainer = container[name];
-    if (!container[name]) {
+    if (!nestedContainer) {
         nestedContainer = {};
         defineValue.call(container, name, nestedContainer);
     }
