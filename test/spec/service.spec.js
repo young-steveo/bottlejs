@@ -6,15 +6,29 @@
      * Bottle Factory test suite
      */
     describe('Bottle#service', function() {
-        it('will log an error if the same key is used twice', function() {
-            var b = new Bottle();
-
-            spyOn(console, 'error');
-            b.service('same', function(){ });
-            expect(console.error).not.toHaveBeenCalled();
-
-            b.service('same', function(){ });
-            expect(console.error).toHaveBeenCalled();
+        describe('when the same key is used twice', function() {
+            beforeEach(function() {
+                this.b = new Bottle();
+                spyOn(console, 'error');
+                this.b.service('same.name', function() {
+                    return function() { };
+                });
+            });
+            describe('when the service has not yet been instantiated', function() {
+                it('doesn\'t log an error', function() {
+                    this.b.service('same.name', function() { });
+                    expect(console.error).not.toHaveBeenCalled();
+                });
+            });
+            describe('when the service has already been instantiated', function() {
+                beforeEach(function() {
+                    this.b.container.same.name();
+                });
+                it('logs an error', function(){
+                    this.b.service('same.name', function(){ });
+                    expect(console.error).toHaveBeenCalled();
+                });
+            });
         });
         it('creates a provider and service instance on the container', function() {
             var b = new Bottle();
