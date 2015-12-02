@@ -31,16 +31,18 @@ var reducer = function reducer(instance, func) {
  * @return Bottle
  */
 var provider = function provider(fullname, Provider) {
-    var parts, providers, name, id, factory;
-
+    var parts, providers, providerName, name, id, factory;
     id = this.id;
     providers = get(providerMap, id);
-    if (providers[fullname]) {
-        return console.error(fullname + ' provider already registered.');
+    parts = fullname.split('.');
+    if (providers[fullname] && parts.length === 1) {
+        providerName = fullname + 'Provider';
+        if (this.container[providerName] === undefined) {
+            return console.error(fullname + ' provider already instantiated.');
+        }
     }
     providers[fullname] = true;
 
-    parts = fullname.split('.');
     name = parts.shift();
     factory = parts.length ? createSubProvider : createProvider;
 
