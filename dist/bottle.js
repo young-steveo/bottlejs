@@ -1,7 +1,7 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v1.1.1 - 2015-11-18
+     * BottleJS v1.2.0 - 2015-12-02
      * A powerful dependency injection micro container
      *
      * Copyright (c) 2015 Stephen Young
@@ -325,16 +325,14 @@
      * @return Bottle
      */
     var provider = function provider(fullname, Provider) {
-        var parts, providers, name, id, factory;
-    
-        id = this.id;
-        providers = get(providerMap, id);
-        if (providers[fullname]) {
-            return console.error(fullname + ' provider already registered.');
+        var parts, providers, name, factory;
+        providers = get(providerMap, this.id);
+        parts = fullname.split('.');
+        if (providers[fullname] && parts.length === 1 && !this.container[fullname + 'Provider']) {
+            return console.error(fullname + ' provider already instantiated.');
         }
         providers[fullname] = true;
     
-        parts = fullname.split('.');
         name = parts.shift();
         factory = parts.length ? createSubProvider : createProvider;
     
