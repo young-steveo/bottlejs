@@ -58,6 +58,41 @@
             expect(b.container.Thing instanceof Thing).toBe(true);
             expect(provider.$get).toHaveBeenCalledWith(b.container);
         });
+        describe('when $get throws an error', function() {
+            beforeEach(function() {
+                this.b = new Bottle();
+                this.e = new Error();
+                this.$getSpy = jasmine.createSpy().and.throwError(this.e);
+                var $getSpy = this.$getSpy;
+                this.b.provider('thrower', function() {
+                    this.$get = $getSpy;
+                });
+            });
+            describe('getting the service from the container', function() {
+                it('throws the error', function() {
+                    var context = this;
+                    expect(function() { return context.b.container.thrower; }).toThrow(this.e);
+                });
+                it('continues to throw the error for subsequent requests', function() {
+                    var context = this;
+                    expect(function() { return context.b.container.thrower; }).toThrow(this.e);
+                    expect(function() { return context.b.container.thrower; }).toThrow(this.e);
+                });
+                describe('when $get stops throwing an error', function() {
+                    beforeEach(function() {
+                        this.value = 'OK';
+                        this.$getSpy.and.returnValue(this.value);
+                    });
+                    it('no longer throws the error', function() {
+                        var context = this;
+                        expect(function() { return context.b.container.thrower; }).not.toThrow();
+                    });
+                    it('returns the service', function() {
+                        expect(this.b.container.thrower).toBe(this.value);
+                    });
+                });
+            });
+        });
 
         it('lazily creates the service it provides', function() {
             var i = 0;
