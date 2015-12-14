@@ -18,6 +18,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-wrap');
+    grunt.loadTasks('grunt/tasks');
 
     grunt.registerTask('default', ['clean', 'concat', 'wrap', 'jshint', 'uglify']);
     grunt.registerTask('test', ['default', 'jasmine']);
