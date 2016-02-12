@@ -34,3 +34,10 @@ Bottle.prototype = {
  * Bottle static
  */
 Bottle.pop = pop;
+
+/**
+ * Global config
+ */
+var globalConfig = Bottle.config = {
+    strict : false
+};
