@@ -38,6 +38,6 @@ Bottle.pop = pop;
 /**
  * Global config
  */
-Bottle.config = {
+var globalConfig = Bottle.config = {
     strict : false
 };

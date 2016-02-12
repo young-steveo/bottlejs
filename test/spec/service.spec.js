@@ -71,5 +71,32 @@
             expect(b.container.Thing.sub).toBeDefined();
             expect(b.container.Thing.sub instanceof SubThing).toBe(true);
         });
+
+        describe('strict service resolution', function() {
+            afterEach(function() {
+                Bottle.config.strict = false;
+            });
+            it('will not care if a service is undefined when strict mode is off', function() {
+                var b = new Bottle();
+                var Thing = function(phantom) { this.phantom = phantom; };
+
+                Bottle.config.strict = false;
+                b.service('Thing', Thing, 'PhantomService');
+                expect(b.container.Thing).toBeDefined();
+                expect(b.container.Thing.phantom).toBeUndefined();
+            });
+            it('will throw an exception if a service is undefined in strict mode', function() {
+                var b = new Bottle();
+                var Thing = function(phantom) { this.phantom = phantom; };
+
+                Bottle.config.strict = true;
+                b.service('Thing', Thing, 'PhantomService');
+
+                var test = function() {
+                    return b.container.Thing;
+                };
+                expect(test).toThrowError(/PhantomService/);
+            });
+        });
     });
 }());
