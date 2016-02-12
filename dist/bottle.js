@@ -1,10 +1,10 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v1.2.1 - 2015-12-14
+     * BottleJS v1.2.2 - 2016-02-12
      * A powerful dependency injection micro container
      *
-     * Copyright (c) 2015 Stephen Young
+     * Copyright (c) 2016 Stephen Young
      * Licensed MIT
      */
     
@@ -88,12 +88,20 @@
     /**
      * Iterator used to walk down a nested object.
      *
+     * If Bottle.config.strict is true, this method will throw an exception if it encounters an
+     * undefined path
+     *
      * @param Object obj
      * @param String prop
      * @return mixed
+     * @throws
      */
     var getNested = function getNested(obj, prop) {
-        return obj[prop];
+        var service = obj[prop];
+        if (service === undefined && globalConfig.strict) {
+            throw new Error('Bottle was unable to resolve a service.  `' + prop + '` is undefined.');
+        }
+        return service;
     };
     
     /**
@@ -553,6 +561,13 @@
      * Bottle static
      */
     Bottle.pop = pop;
+    
+    /**
+     * Global config
+     */
+    var globalConfig = Bottle.config = {
+        strict : false
+    };
     
     /**
      * Exports script adapted from lodash v2.4.1 Modern Build
