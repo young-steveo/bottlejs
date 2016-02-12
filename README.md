@@ -210,6 +210,14 @@ Param                      | Type       | Details
 :--------------------------|:-----------|:--------
 **name**<br />*(optional)* | *String*   | The name of the bottle. If passed, bottle will store the instance internally and return the same instance if `Bottle.pop` is subsequently called with the same name.
 
+#### config
+
+A global configuration object.
+
+Property   | Type      | Default | Details
+:----------|:----------|:--------|:--------
+**strict** | *Boolean* | `false` | Enables strict mode.  Currently only verifies that automatically injected dependencies are not undefined.
+
 ### Bottle.prototype
 
 #### constant(name, value)
@@ -279,6 +287,8 @@ Param        | Type       | Details
 
 Used to register a service, factory, provider, or value based on properties of the Obj.  `bottle.container.$register` is an alias of `bottle.register`; this allows factories and providers to register multiple services on the container without needing access to the bottle instance itself.
 
+If `Bottle.config.strict` is set to `true`, this method will throw an error if an injected dependency is `undefined`.
+
 Param   | Type       | Details
 :-------|:-----------|:--------
 **Obj** | *Object*\|*Function* | An object or constructor with one of several properties:<br /><ul><li>**Obj.$name** &mdash; *required* &mdash; the name used to register the object</li><li>**Obj.$type** &mdash; *optional* &mdash; the method used to register the object.  Defaults to `'service'` in which case the Obj will be treated as a constructor. Valid types are: `'service'`, `'factory'`, `'provider'`, `'value'`</li><li>**Obj.$inject** &mdash; *optional* &mdash; If `Obj.$type` is `'service'`, this property can be a string name or an array of names of dependencies to inject into the constructor.<br />E.g. `Obj.$inject = ['dep1', 'dep2'];`</li><li>**Obj.$value** &mdash; *optional* &mdash; Normally Obj is registered on the container.  However, if this property is included, it's value will be registered on the container instead of the object itself.  Useful for registering objects on the bottle container without modifying those objects with bottle specific keys.</li></ul>
@@ -293,7 +303,7 @@ Param                      | Type    | Details
 
 #### service(name, Constructor [, dependency [, ...]])
 
-Used to register a service constructor
+Used to register a service constructor.  If `Bottle.config.strict` is set to `true`, this method will throw an error if an injected dependency is `undefined`.
 
 Param                            | Type       | Details
 :--------------------------------|:-----------|:--------
