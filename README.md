@@ -322,4 +322,4 @@ Param    | Type     | Details
 
 ## TypeScript
 
-A TypeScript declaration file is bundled with this package. To get TypeScript resolves it automatically, you need to set `moduleResolution` to `node` in your `tsconfig.json`. 
+A TypeScript declaration file is bundled with this package. To get TypeScript to resolve it automatically, you need to set `moduleResolution` to `node` in your `tsconfig.json`. 
