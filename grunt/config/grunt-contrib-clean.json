@@ -1,5 +1,5 @@
 {
     "clean" : {
-        "dist" : ["dist/"]
+        "dist" : ["dist/*","!dist/bottle.d.ts"]
     }
 }
