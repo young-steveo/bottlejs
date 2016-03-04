@@ -1,7 +1,7 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v1.2.2 - 2016-02-12
+     * BottleJS v1.2.3 - 2016-03-04
      * A powerful dependency injection micro container
      *
      * Copyright (c) 2016 Stephen Young
