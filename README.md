@@ -319,3 +319,7 @@ Param    | Type     | Details
 :--------|:---------|:--------
 **name** | *String* | The name of the value.  Must be unique to each Bottle instance.
 **val**  | *Mixed*  | A value that will be defined as enumerable, but not writable.
+
+## TypeScript
+
+A TypeScript declaration file is bundled with this package. To get TypeScript to resolve it automatically, you need to set `moduleResolution` to `node` in your `tsconfig.json`. 
