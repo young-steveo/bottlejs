@@ -103,7 +103,7 @@ bottle.factory('Beer', function(container) {
 
 ### Service Provider
 
-This is the meat of the Bottle library.  The above methods `Bottle#service` and `Bottle#factory` are just shorthand for the provider function.  You usually can get by with the simple functions above, but if you really need more granular control of your services in different environments, regiser them as a provider.  To use it, pass a constructor for the provider that exposes a `$get` function.  The `$get` function is used as a factory to build your service.
+This is the meat of the Bottle library.  The above methods `Bottle#service` and `Bottle#factory` are just shorthand for the provider function.  You usually can get by with the simple functions above, but if you really need more granular control of your services in different environments, register them as a provider.  To use it, pass a constructor for the provider that exposes a `$get` function.  The `$get` function is used as a factory to build your service.
 
 ```js
 var bottle = new Bottle();
