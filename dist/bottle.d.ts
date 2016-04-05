@@ -1,4 +1,4 @@
-export class Bottle {
+declare class Bottle {
     static pop: (name?: string) => Bottle
     static config: Object;
 
@@ -63,7 +63,9 @@ export class Bottle {
     value(name: string, val: any): this;
 }
 
-export module Bottle {
+export = Bottle;
+
+declare module Bottle {
     interface IRegisterableObject {
         $name: string;
         $type?: string;
