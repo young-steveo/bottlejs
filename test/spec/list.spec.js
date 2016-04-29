@@ -81,5 +81,14 @@
             expect(list.indexOf('$list')).toBe(-1);
             expect(list.length).toBe(2);
         });
+        it('will work with nested bottles', function() {
+            var b = new Bottle();
+            b.service('test.A', function() {});
+            b.service('test.B', function() {});
+
+            var list = b.container.test.$list();
+            expect(list.indexOf('A')).not.toBe(-1);
+            expect(list.indexOf('B')).not.toBe(-1);
+        });
     });
 }());
