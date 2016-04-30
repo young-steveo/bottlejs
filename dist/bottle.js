@@ -94,7 +94,7 @@
      * @param Object obj
      * @param String prop
      * @return mixed
-     * @throws
+     * @throws Error if Bottle is unable to resolve the requested service.
      */
     var getNested = function getNested(obj, prop) {
         var service = obj[prop];
@@ -500,7 +500,7 @@
      *
      * @param String name
      * @param mixed val
-     * @return
+     * @return Bottle
      */
     var value = function value(name, val) {
         var parts;

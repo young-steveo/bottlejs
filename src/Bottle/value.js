@@ -3,7 +3,7 @@
  *
  * @param String name
  * @param mixed val
- * @return
+ * @return Bottle
  */
 var value = function value(name, val) {
     var parts;

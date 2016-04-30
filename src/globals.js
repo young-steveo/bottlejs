@@ -85,7 +85,7 @@ var getMapped = function getMapped(collection, data) {
  * @param Object obj
  * @param String prop
  * @return mixed
- * @throws
+ * @throws Error if Bottle is unable to resolve the requested service.
  */
 var getNested = function getNested(obj, prop) {
     var service = obj[prop];
