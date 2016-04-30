@@ -1,7 +1,7 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v1.2.3 - 2016-03-04
+     * BottleJS v1.3.0 - 2016-04-29
      * A powerful dependency injection micro container
      *
      * Copyright (c) 2016 Stephen Young
@@ -211,6 +211,23 @@
         return provider.call(this, name, function GenericProvider() {
             this.$get = Factory;
         });
+    };
+    
+    /**
+     * A filter function for removing bottle container methods and providers from a list of keys
+     */
+    var byMethod = function byMethod(name) {
+        return !/^\$(?:register|list)$|Provider$/.test(name);
+    };
+    
+    /**
+     * List the services registered on the container.
+     *
+     * @param Object container
+     * @return Array
+     */
+    var list = function list(container) {
+        return Object.keys(container || this.container || {}).filter(byMethod);
     };
     
     /**
@@ -537,7 +554,10 @@
         }
     
         this.id = id++;
-        this.container = { $register : register.bind(this) };
+        this.container = {
+            $register : register.bind(this),
+            $list : list.bind(this)
+        };
     };
     
     /**
@@ -549,6 +569,7 @@
         defer : defer,
         digest : digest,
         factory : factory,
+        list : list,
         middleware : middleware,
         provider : provider,
         register : register,
@@ -561,6 +582,7 @@
      * Bottle static
      */
     Bottle.pop = pop;
+    Bottle.list = list;
     
     /**
      * Global config
