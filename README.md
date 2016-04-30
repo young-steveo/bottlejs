@@ -202,13 +202,25 @@ bottle.container.Beer.IPA; // the service
 
 ### Bottle
 
-#### pop([name])
+#### pop(name)
 
 Used to get an instance of bottle.  If a name is passed, bottle will return the same instance.  Calling the Bottle constructor as a function will call and return return `Bottle.pop`, so `Bottle.pop('Soda') === Bottle('Soda')`
 
 Param                      | Type       | Details
 :--------------------------|:-----------|:--------
 **name**<br />*(optional)* | *String*   | The name of the bottle. If passed, bottle will store the instance internally and return the same instance if `Bottle.pop` is subsequently called with the same name.
+
+#### list(container)
+#### prototype.list()
+#### prototype.container.$list()
+
+Used to list the names of all registered constants, values, and services on the container.  Must pass a container to the global static version `Bottle.list(bottle.container)`.  The instance and container versions return the services that are registered within.
+
+Returns an array of strings.
+
+Param                           | Type       | Details
+:-------------------------------|:-----------|:--------
+**container**<br />*(optional)* | *Object*   | A `bottle.container`.  Only required when using the global, static `Bottle.list` method.  The prototype version uses that instance's container, and the container version uses itself.
 
 #### config
 
@@ -322,4 +334,4 @@ Param    | Type     | Details
 
 ## TypeScript
 
-A TypeScript declaration file is bundled with this package. To get TypeScript to resolve it automatically, you need to set `moduleResolution` to `node` in your `tsconfig.json`. 
+A TypeScript declaration file is bundled with this package. To get TypeScript to resolve it automatically, you need to set `moduleResolution` to `node` in your `tsconfig.json`.
