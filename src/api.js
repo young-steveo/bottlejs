@@ -10,7 +10,10 @@ var Bottle = function Bottle(name) {
     }
 
     this.id = id++;
-    this.container = { $register : register.bind(this) };
+    this.container = {
+        $register : register.bind(this),
+        $list : list.bind(this)
+    };
 };
 
 /**
@@ -22,6 +25,7 @@ Bottle.prototype = {
     defer : defer,
     digest : digest,
     factory : factory,
+    list : list,
     middleware : middleware,
     provider : provider,
     register : register,
@@ -34,6 +38,7 @@ Bottle.prototype = {
  * Bottle static
  */
 Bottle.pop = pop;
+Bottle.list = list;
 
 /**
  * Global config
