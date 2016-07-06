@@ -332,6 +332,32 @@ Param    | Type     | Details
 **name** | *String* | The name of the value.  Must be unique to each Bottle instance.
 **val**  | *Mixed*  | A value that will be defined as enumerable, but not writable.
 
+#### instanceProvider(name, Factory)
+
+Used to register a service instance provider that will return a newly created, fully configured
+instance when called.
+
+Param       | Type       | Details
+:-----------|:-----------|:--------
+**name**    | *String*   | The name of the service.  Must be unique to each Bottle instance.
+**Factory** | *Function* | A function that should return the a fully configured service object.  This factory method will be called whenever a new instance is created.  Gets passed an instance of the container to allow dependency injection when creating a new instance of the service.
+
+```js
+var bottle = new Bottle();
+var Hefeweizen = function(container) { return { abv: Math.random() * (6 - 4) + 4 }};
+bottle.instanceProvider('Beer.Hefeweizen', Hefeweizen);
+
+let provider = bottle.container.Beer.Hefeweizen; // This is an InstanceProvider with a single `instance` method on it
+
+let beer1 = provider.instance(); // Calls factory function to create a new instance
+let beer2 = provider.instance(); // Calls factory function to create a second new instance
+
+beer1 !== beer2
+```
+
+This pattern is especially useful for request based context objects that store state or things like database connections.  See the documentation for Google Guice's [InjectingProviders](https://github.com/google/guice/wiki/InjectingProviders) for more examples.
+
+
 ## TypeScript
 
 A TypeScript declaration file is bundled with this package. To get TypeScript to resolve it automatically, you need to set `moduleResolution` to `node` in your `tsconfig.json`.
