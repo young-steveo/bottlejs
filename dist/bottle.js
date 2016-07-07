@@ -1,7 +1,7 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v1.3.0 - 2016-07-06
+     * BottleJS v1.3.0 - 2016-04-29
      * A powerful dependency injection micro container
      *
      * Copyright (c) 2016 Stephen Young
@@ -212,32 +212,6 @@
             this.$get = Factory;
         });
     };
-    
-    /**
-     * Register an instance provider inside a generic provider.
-     *
-     * @param {String} name - The name of the service
-     * @param {Function} Factory - The factory function, matches the signature required for the
-     * `factory` method
-     * @return Bottle
-     */
-    var instanceProvider = function instanceProvider(name, Factory) {
-      return provider.call(this, name, function GenericProvider() {
-        this.$get = function(container) {
-          return new InstanceProvider(container, Factory);
-        }
-      });
-    };
-    
-    function InstanceProvider(container, factoryFunction) {
-      this.container = container;
-      this.factoryFunction = factoryFunction;
-    }
-    
-    InstanceProvider.prototype.instance = function() {
-      return this.factoryFunction(this.container);
-    };
-    
     
     /**
      * A filter function for removing bottle container methods and providers from a list of keys
@@ -595,7 +569,6 @@
         defer : defer,
         digest : digest,
         factory : factory,
-        instanceProvider: instanceProvider,
         list : list,
         middleware : middleware,
         provider : provider,
