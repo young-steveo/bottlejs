@@ -340,7 +340,7 @@ instance when called.
 Param       | Type       | Details
 :-----------|:-----------|:--------
 **name**    | *String*   | The name of the service.  Must be unique to each Bottle instance.
-**Factory** | *Function* | A function that should return the a fully configured service object.  This factory method will be called whenever a new instance is created.  Gets passed an instance of the container to allow dependency injection when creating a new instance of the service.
+**Factory** | *Function* | A function that should return a fully configured service object. This factory function will be called whenever a new instance is created. Gets passed an instance of the container to allow dependency injection when creating a new instance of the service.
 
 ```js
 var bottle = new Bottle();
