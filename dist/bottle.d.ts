@@ -40,7 +40,7 @@ declare class Bottle {
     /**
      * Register a service provider
      */
-    provider(name: string, Provider: ((...any) => void)): this;
+    provider(name: string, Provider: ((...any: any[]) => void)): this;
 
     /**
      * Register a service, factory, provider, or value based on properties of the Obj.
@@ -55,7 +55,7 @@ declare class Bottle {
     /**
      * Register a service constructor. If Bottle.config.strict is set to true, this method will throw an error if an injected dependency is undefined.
      */
-    service(name: string, Constructor: ((...any) => any), ...dependency: string[]): this;
+    service(name: string, Constructor: ((...any: any[]) => any), ...dependency: string[]): this;
 
     /**
      * Add an arbitrary value to the container.
