@@ -25,7 +25,7 @@ Bottle.prototype = {
     defer : defer,
     digest : digest,
     factory : factory,
-    instanceProvider: instanceProvider,
+    instanceFactory: instanceFactory,
     list : list,
     middleware : middleware,
     provider : provider,

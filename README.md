@@ -276,6 +276,30 @@ Param       | Type       | Details
 **name**    | *String*   | The name of the service.  Must be unique to each Bottle instance.
 **Factory** | *Function* | A function that should return the service object.  Will only be called once; the Service will be a singleton.  Gets passed an instance of the container to allow dependency injection when creating the service.
 
+#### instanceFactory(name, Factory)
+
+Used to register a service instance factory that will return an instance when called.
+
+Param       | Type       | Details
+:-----------|:-----------|:--------
+**name**    | *String*   | The name of the service.  Must be unique to each Bottle instance.
+**Factory** | *Function* | A function that should return a fully configured service object. This factory function will be executed when a new instance is created. Gets passed an instance of the container.
+
+```js
+var bottle = new Bottle();
+var Hefeweizen = function(container) { return { abv: Math.random() * (6 - 4) + 4 }};
+bottle.instanceFactory('Beer.Hefeweizen', Hefeweizen);
+
+var hefeFactory = bottle.container.Beer.Hefeweizen; // This is an instance factory with a single `instance` method
+
+var beer1 = hefeFactory.instance(); // Calls factory function to create a new instance
+var beer2 = hefeFactory.instance(); // Calls factory function to create a second new instance
+
+beer1 !== beer2 // true
+```
+
+This pattern is especially useful for request based context objects that store state or things like database connections.  See the documentation for Google Guice's [InjectingProviders](https://github.com/google/guice/wiki/InjectingProviders) for more examples.
+
 #### middleware(name, func)
 
 Used to register a middleware function.  This function will be executed every time the service is accessed.
@@ -331,32 +355,6 @@ Param    | Type     | Details
 :--------|:---------|:--------
 **name** | *String* | The name of the value.  Must be unique to each Bottle instance.
 **val**  | *Mixed*  | A value that will be defined as enumerable, but not writable.
-
-#### instanceProvider(name, Factory)
-
-Used to register a service instance provider that will return a newly created, fully configured
-instance when called.
-
-Param       | Type       | Details
-:-----------|:-----------|:--------
-**name**    | *String*   | The name of the service.  Must be unique to each Bottle instance.
-**Factory** | *Function* | A function that should return a fully configured service object. This factory function will be called whenever a new instance is created. Gets passed an instance of the container to allow dependency injection when creating a new instance of the service.
-
-```js
-var bottle = new Bottle();
-var Hefeweizen = function(container) { return { abv: Math.random() * (6 - 4) + 4 }};
-bottle.instanceProvider('Beer.Hefeweizen', Hefeweizen);
-
-let provider = bottle.container.Beer.Hefeweizen; // This is an InstanceProvider with a single `instance` method on it
-
-let beer1 = provider.instance(); // Calls factory function to create a new instance
-let beer2 = provider.instance(); // Calls factory function to create a second new instance
-
-beer1 !== beer2
-```
-
-This pattern is especially useful for request based context objects that store state or things like database connections.  See the documentation for Google Guice's [InjectingProviders](https://github.com/google/guice/wiki/InjectingProviders) for more examples.
-
 
 ## TypeScript
 
