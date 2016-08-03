@@ -32,6 +32,16 @@ declare class Bottle {
     factory(name: string, Factory: (container: Bottle.IContainer) => any): this;
 
     /**
+     * Register a service instance factory
+     */
+    instanceFactory(name: string, Factory: (container: Bottle.IContainer) => any): this;
+
+    /**
+     * List the services registered on the container
+     */
+     list(container?: Bottle.IContainer): Array<string>;
+
+    /**
      * Register a middleware function. This function will be executed every time the service is accessed.
      */
     middleware(name: string|((service: any, next: (error?: Error) => void) => void),
