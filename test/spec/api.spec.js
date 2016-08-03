@@ -26,14 +26,26 @@
             it("exposes constant", function() {
                 expect(Bottle.pop().constant).toBeDefined();
             });
-            it("exposes factory", function() {
-                expect(Bottle.pop().factory).toBeDefined();
-            });
             it("exposes decorator", function() {
                 expect(Bottle.pop().decorator).toBeDefined();
             });
             it("exposes defer", function() {
                 expect(Bottle.pop().defer).toBeDefined();
+            });
+            it("exposes digest", function() {
+                expect(Bottle.pop().digest).toBeDefined();
+            });
+            it("exposes factory", function() {
+                expect(Bottle.pop().factory).toBeDefined();
+            });
+            it("exposes instanceFactory", function() {
+                expect(Bottle.pop().instanceFactory).toBeDefined();
+            });
+            it("exposes list", function() {
+                expect(Bottle.pop().list).toBeDefined();
+            });
+            it("exposes middleware", function() {
+                expect(Bottle.pop().middleware).toBeDefined();
             });
             it("exposes provider", function() {
                 expect(Bottle.pop().provider).toBeDefined();
