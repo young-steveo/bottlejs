@@ -1,6 +1,14 @@
 
 ![BottleJS](/bottle-logo.jpg)
-# BottleJS [![Build Status](https://travis-ci.org/young-steveo/bottlejs.svg?branch=master)](https://travis-ci.org/young-steveo/bottlejs)
+# BottleJS
+
+[![Build Status](https://travis-ci.org/young-steveo/bottlejs.svg?branch=master)](https://travis-ci.org/young-steveo/bottlejs)
+[![npm version](https://badge.fury.io/js/bottlejs.svg)](https://badge.fury.io/js/bottlejs)
+[![dependencies Status](https://david-dm.org/young-steveo/bottlejs/status.svg)](https://david-dm.org/young-steveo/bottlejs)
+[![Known Vulnerabilities](https://snyk.io/test/github/young-steveo/bottlejs/badge.svg)](https://snyk.io/test/github/young-steveo/bottlejs)
+
+[![NPM](https://nodei.co/npm/bottlejs.png?downloads=true&downloadRank=true)](https://nodei.co/npm/bottlejs/)
+[![NPM](https://nodei.co/npm-dl/bottlejs.png?months=9&height=3)](https://nodei.co/npm/bottlejs/)
 
 > A powerful dependency injection micro container
 
