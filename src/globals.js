@@ -14,22 +14,11 @@ var id = 0;
 var slice = Array.prototype.slice;
 
 /**
- * Map of fullnames by index => name
+ * Map of nested bottles by index => name
  *
  * @type Array
  */
-var fullnameMap = [];
-
-/**
- * Iterator used to flatten arrays with reduce.
- *
- * @param Array a
- * @param Array b
- * @return Array
- */
-var concatIterator = function concatIterator(a, b) {
-    return a.concat(b);
-};
+var nestedBottles = [];
 
 /**
  * Get a group (middleware, decorator, etc.) for this bottle instance and service name.
@@ -51,7 +40,7 @@ var get = function get(collection, id, name) {
 };
 
 /**
- * Will try to get all things from a collection by name, by __global__, and by mapped names.
+ * Will try to get all things from a collection by name, and by __global__.
  *
  * @param Array collection
  * @param Number id
@@ -59,21 +48,7 @@ var get = function get(collection, id, name) {
  * @return Array
  */
 var getAllWithMapped = function(collection, id, name) {
-    return get(fullnameMap, id, name)
-        .map(getMapped.bind(null, collection))
-        .reduce(concatIterator, get(collection, id, name))
-        .concat(get(collection, id, '__global__'));
-};
-
-/**
- * Iterator used to get decorators from a map
- *
- * @param Array collection
- * @param Object data
- * @return Function
- */
-var getMapped = function getMapped(collection, data) {
-    return get(collection, data.id, data.fullname);
+    return get(collection, id, name).concat(get(collection, id, '__global__'));
 };
 
 /**
@@ -93,6 +68,18 @@ var getNested = function getNested(obj, prop) {
         throw new Error('Bottle was unable to resolve a service.  `' + prop + '` is undefined.');
     }
     return service;
+};
+
+/**
+ * Getet a nested bottle from nestedBottles.  will set and return if not set.
+ *
+ * @param String name
+ * @return Bottle
+ */
+var getNestedBottle = function getNestedBottle(name, id) {
+    bottles = get(nestedBottles, id);
+    var t = bottles[name] || (bottles[name] = Bottle.pop());
+    return t;
 };
 
 /**

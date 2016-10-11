@@ -1,11 +1,4 @@
 /**
- * Map of nested bottles by index => name
- *
- * @type Array
- */
-var nestedBottles = [];
-
-/**
  * Map of provider constructors by index => name
  *
  * @type Array
@@ -31,7 +24,7 @@ var reducer = function reducer(instance, func) {
  * @return Bottle
  */
 var provider = function provider(fullname, Provider) {
-    var parts, providers, name, factory;
+    var parts, providers, name;
     providers = get(providerMap, this.id);
     parts = fullname.split('.');
     if (providers[fullname] && parts.length === 1 && !this.container[fullname + 'Provider']) {
@@ -40,9 +33,12 @@ var provider = function provider(fullname, Provider) {
     providers[fullname] = true;
 
     name = parts.shift();
-    factory = parts.length ? createSubProvider : createProvider;
 
-    return factory.call(this, name, Provider, fullname, parts);
+    if (parts.length) {
+        createSubProvider.call(this, name, Provider, parts);
+        return this;
+    }
+    return createProvider.call(this, name, Provider);
 };
 
 /**
@@ -100,23 +96,14 @@ var createProvider = function createProvider(name, Provider) {
  *
  * @param String name
  * @param Function Provider
- * @param String fullname
  * @param Array parts
  * @return Bottle
  */
-var createSubProvider = function createSubProvider(name, Provider, fullname, parts) {
-    var bottle, bottles, subname, id;
-
-    id = this.id;
-    bottles = get(nestedBottles, id);
-    bottle = bottles[name];
-    if (!bottle) {
-        this.container[name] = (bottle = bottles[name] = Bottle.pop()).container;
-    }
-    subname = parts.join('.');
-    bottle.provider(subname, Provider);
-
-    set(fullnameMap, bottle.id, subname, { fullname : fullname, id : id });
-
-    return this;
+var createSubProvider = function createSubProvider(name, Provider, parts) {
+    var bottle;
+    bottle = getNestedBottle(name, this.id);
+    this.factory(name, function SubProviderFactory() {
+        return bottle.container;
+    });
+    return bottle.provider(parts.join('.'), Provider);
 };

@@ -39,5 +39,25 @@
             });
             expect(b.container.Util.Thing.name).toBe('Util FooBar');
         });
+
+        it('will decorate deeply nested services', function() {
+            var b = new Bottle();
+            b.service('Util.A.B.C.Thing', function() { this.name = 'Util'; });
+            b.decorator('Util.A.B.C.Thing', function(Service) {
+                Service.name = 'Util Deep FooBar';
+                return Service;
+            });
+            expect(b.container.Util.A.B.C.Thing.name).toBe('Util Deep FooBar');
+        });
+
+        it('will allow decorators to be defined before services', function() {
+            var b = new Bottle();
+            b.decorator('Util.A.B.C.Thing', function(Service) {
+                Service.name = 'Util Deep FooBar';
+                return Service;
+            });
+            b.service('Util.A.B.C.Thing', function() { this.name = 'Util'; });
+            expect(b.container.Util.A.B.C.Thing.name).toBe('Util Deep FooBar');
+        });
     });
 }());

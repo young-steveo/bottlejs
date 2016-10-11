@@ -51,7 +51,19 @@ var applyMiddleware = function applyMiddleware(id, name, instance, container) {
  * @param Function func
  * @return Bottle
  */
-var middleware = function middleware(name, func) {
-    set(middles, this.id, name, func);
+var middleware = function middleware(fullname, func) {
+    var parts, name;
+    if (typeof fullname === 'function') {
+        set(middles, this.id, fullname);
+        return this;
+    }
+
+    parts = fullname.split('.');
+    name = parts.shift();
+    if (parts.length) {
+        getNestedBottle(name, this.id).middleware(parts.join('.'), func);
+    } else {
+        set(middles, this.id, name, func);
+    }
     return this;
 };
