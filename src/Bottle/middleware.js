@@ -1,11 +1,4 @@
 /**
- * Map of middleware by index => name
- *
- * @type Object
- */
-var middles = [];
-
-/**
  * Function used by provider to set up middleware for each request.
  *
  * @param Number id
@@ -14,8 +7,7 @@ var middles = [];
  * @param Object container
  * @return void
  */
-var applyMiddleware = function applyMiddleware(id, name, instance, container) {
-    var middleware = getAllWithMapped(middles, id, name);
+var applyMiddleware = function applyMiddleware(middleware, name, instance, container) {
     var descriptor = {
         configurable : true,
         enumerable : true
@@ -54,8 +46,8 @@ var applyMiddleware = function applyMiddleware(id, name, instance, container) {
 var middleware = function middleware(fullname, func) {
     var parts, name;
     if (typeof fullname === 'function') {
-        set(middles, this.id, fullname);
-        return this;
+        func = fullname;
+        fullname = '__global__';
     }
 
     parts = fullname.split('.');
@@ -63,7 +55,10 @@ var middleware = function middleware(fullname, func) {
     if (parts.length) {
         getNestedBottle(name, this.id).middleware(parts.join('.'), func);
     } else {
-        set(middles, this.id, name, func);
+        if (!this.middlewares[name]) {
+            this.middlewares[name] = [];
+        }
+        this.middlewares[name].push(func);
     }
     return this;
 };

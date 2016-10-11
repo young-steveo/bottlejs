@@ -42,6 +42,15 @@ var provider = function provider(fullname, Provider) {
 };
 
 /**
+ * Get decorators and middleware including globals
+ *
+ * @return array
+ */
+var getWithGlobal = function getWithGlobal(collection, name) {
+    return (collection[name] || []).concat(collection.__global__ || []);
+};
+
+/**
  * Create the provider properties on the container
  *
  * @param String fullname
@@ -50,10 +59,12 @@ var provider = function provider(fullname, Provider) {
  * @return Bottle
  */
 var createProvider = function createProvider(name, Provider) {
-    var providerName, properties, container, id;
+    var providerName, properties, container, id, decorators, middlewares;
 
     id = this.id;
     container = this.container;
+    decorators = this.decorators;
+    middlewares = this.middlewares;
     providerName = name + 'Provider';
 
     properties = Object.create(null);
@@ -76,13 +87,13 @@ var createProvider = function createProvider(name, Provider) {
             var instance;
             if (provider) {
                 // filter through decorators
-                instance = getAllWithMapped(decorators, id, name)
-                    .reduce(reducer, provider.$get(container));
+                instance = getWithGlobal(decorators, name).reduce(reducer, provider.$get(container));
 
                 delete container[providerName];
                 delete container[name];
             }
-            return instance === undefined ? instance : applyMiddleware(id, name, instance, container);
+            return instance === undefined ? instance : applyMiddleware(getWithGlobal(middlewares, name),
+                name, instance, container);
         }
     };
 

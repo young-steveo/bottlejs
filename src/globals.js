@@ -40,18 +40,6 @@ var get = function get(collection, id, name) {
 };
 
 /**
- * Will try to get all things from a collection by name, and by __global__.
- *
- * @param Array collection
- * @param Number id
- * @param String name
- * @return Array
- */
-var getAllWithMapped = function(collection, id, name) {
-    return get(collection, id, name).concat(get(collection, id, '__global__'));
-};
-
-/**
  * Iterator used to walk down a nested object.
  *
  * If Bottle.config.strict is true, this method will throw an exception if it encounters an
@@ -90,19 +78,4 @@ var getNestedBottle = function getNestedBottle(name, id) {
  */
 var getNestedService = function getNestedService(fullname) {
     return fullname.split('.').reduce(getNested, this);
-};
-
-/**
- * A helper function for pushing middleware and decorators onto their stacks.
- *
- * @param Array collection
- * @param String name
- * @param Function func
- */
-var set = function set(collection, id, name, func) {
-    if (typeof name === 'function') {
-        func = name;
-        name = '__global__';
-    }
-    get(collection, id, name).push(func);
 };

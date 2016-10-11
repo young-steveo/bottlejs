@@ -6,7 +6,7 @@
  * @return Bottle
  */
 var resolve = function resolve(data) {
-    get(deferred, this.id, '__global__').forEach(function deferredIterator(func) {
+    this.deferred.forEach(function deferredIterator(func) {
         func(data);
     });
 

@@ -1,11 +1,4 @@
 /**
- * Map of decorator by index => name
- *
- * @type Object
- */
-var decorators = [];
-
-/**
  * Register decorator.
  *
  * @param String fullname
@@ -15,8 +8,8 @@ var decorators = [];
 var decorator = function decorator(fullname, func) {
     var parts, name;
     if (typeof fullname === 'function') {
-        set(decorators, this.id, fullname);
-        return this;
+        func = fullname;
+        fullname = '__global__';
     }
 
     parts = fullname.split('.');
@@ -24,7 +17,10 @@ var decorator = function decorator(fullname, func) {
     if (parts.length) {
         getNestedBottle(name, this.id).decorator(parts.join('.'), func);
     } else {
-        set(decorators, this.id, name, func);
+        if (!this.decorators[name]) {
+            this.decorators[name] = [];
+        }
+        this.decorators[name].push(func);
     }
     return this;
 };
