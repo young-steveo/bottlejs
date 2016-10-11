@@ -1,11 +1,4 @@
 /**
- * Map of provider constructors by index => name
- *
- * @type Array
- */
-var providerMap = [];
-
-/**
  * Used to process decorators in the provider
  *
  * @param Object instance
@@ -24,13 +17,12 @@ var reducer = function reducer(instance, func) {
  * @return Bottle
  */
 var provider = function provider(fullname, Provider) {
-    var parts, providers, name;
-    providers = get(providerMap, this.id);
+    var parts, name;
     parts = fullname.split('.');
-    if (providers[fullname] && parts.length === 1 && !this.container[fullname + 'Provider']) {
+    if (this.providerMap[fullname] && parts.length === 1 && !this.container[fullname + 'Provider']) {
         return console.error(fullname + ' provider already instantiated.');
     }
-    providers[fullname] = true;
+    this.providerMap[fullname] = true;
 
     name = parts.shift();
 

@@ -21,25 +21,6 @@ var slice = Array.prototype.slice;
 var nestedBottles = [];
 
 /**
- * Get a group (middleware, decorator, etc.) for this bottle instance and service name.
- *
- * @param Array collection
- * @param Number id
- * @param String name
- * @return Array
- */
-var get = function get(collection, id, name) {
-    var group = collection[id];
-    if (!group) {
-        group = collection[id] = {};
-    }
-    if (name && !group[name]) {
-        group[name] = [];
-    }
-    return name ? group[name] : group;
-};
-
-/**
  * Iterator used to walk down a nested object.
  *
  * If Bottle.config.strict is true, this method will throw an exception if it encounters an
@@ -59,15 +40,18 @@ var getNested = function getNested(obj, prop) {
 };
 
 /**
- * Getet a nested bottle from nestedBottles.  will set and return if not set.
+ * Get a nested bottle from nestedBottles.  Will set and return if not set.
  *
  * @param String name
  * @return Bottle
  */
 var getNestedBottle = function getNestedBottle(name, id) {
-    bottles = get(nestedBottles, id);
-    var t = bottles[name] || (bottles[name] = Bottle.pop());
-    return t;
+    var bottles = nestedBottles[id];
+    if (!bottles) {
+        bottles = nestedBottles[id] = {};
+    }
+
+    return bottles[name] || (bottles[name] = Bottle.pop());
 };
 
 /**
