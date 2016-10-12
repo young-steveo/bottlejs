@@ -52,6 +52,26 @@
             expect(b.container.Util.Thing.name).toBe('Middleware Thing');
         });
 
+        it('can handle deeply nested dot notation keys', function() {
+            var b = new Bottle();
+            b.service('Util.A.B.C.Thing', function() { this.name = 'Util Thing'; });
+            b.middleware('Util.A.B.C.Thing', function(service, next) {
+                service.name = 'Middleware Thing';
+                next();
+            });
+            expect(b.container.Util.A.B.C.Thing.name).toBe('Middleware Thing');
+        });
+
+        it('can register middleware before the service', function() {
+            var b = new Bottle();
+            b.middleware('Util.A.B.C.Thing', function(service, next) {
+                service.name = 'Middleware Thing';
+                next();
+            });
+            b.service('Util.A.B.C.Thing', function() { this.name = 'Util Thing'; });
+            expect(b.container.Util.A.B.C.Thing.name).toBe('Middleware Thing');
+        });
+
         it('throw error when next(err)', function() {
             var b = new Bottle();
             b.service('Thing', function() { this.name = 'Thing'; });

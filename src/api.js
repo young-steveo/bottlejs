@@ -10,6 +10,11 @@ var Bottle = function Bottle(name) {
     }
 
     this.id = id++;
+
+    this.decorators = {};
+    this.middlewares = {};
+    this.providerMap = {};
+    this.deferred = [];
     this.container = {
         $register : register.bind(this),
         $list : list.bind(this)
