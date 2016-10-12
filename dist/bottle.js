@@ -1,7 +1,7 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v1.4.0 - 2016-10-12
+     * BottleJS v1.4.0 - 2016-08-03
      * A powerful dependency injection micro container
      *
      * Copyright (c) 2016 Stephen Young
@@ -23,6 +23,69 @@
     var slice = Array.prototype.slice;
     
     /**
+     * Map of fullnames by index => name
+     *
+     * @type Array
+     */
+    var fullnameMap = [];
+    
+    /**
+     * Iterator used to flatten arrays with reduce.
+     *
+     * @param Array a
+     * @param Array b
+     * @return Array
+     */
+    var concatIterator = function concatIterator(a, b) {
+        return a.concat(b);
+    };
+    
+    /**
+     * Get a group (middleware, decorator, etc.) for this bottle instance and service name.
+     *
+     * @param Array collection
+     * @param Number id
+     * @param String name
+     * @return Array
+     */
+    var get = function get(collection, id, name) {
+        var group = collection[id];
+        if (!group) {
+            group = collection[id] = {};
+        }
+        if (name && !group[name]) {
+            group[name] = [];
+        }
+        return name ? group[name] : group;
+    };
+    
+    /**
+     * Will try to get all things from a collection by name, by __global__, and by mapped names.
+     *
+     * @param Array collection
+     * @param Number id
+     * @param String name
+     * @return Array
+     */
+    var getAllWithMapped = function(collection, id, name) {
+        return get(fullnameMap, id, name)
+            .map(getMapped.bind(null, collection))
+            .reduce(concatIterator, get(collection, id, name))
+            .concat(get(collection, id, '__global__'));
+    };
+    
+    /**
+     * Iterator used to get decorators from a map
+     *
+     * @param Array collection
+     * @param Object data
+     * @return Function
+     */
+    var getMapped = function getMapped(collection, data) {
+        return get(collection, data.id, data.fullname);
+    };
+    
+    /**
      * Iterator used to walk down a nested object.
      *
      * If Bottle.config.strict is true, this method will throw an exception if it encounters an
@@ -42,16 +105,6 @@
     };
     
     /**
-     * Get a nested bottle. Will set and return if not set.
-     *
-     * @param String name
-     * @return Bottle
-     */
-    var getNestedBottle = function getNestedBottle(name) {
-        return this.nested[name] || (this.nested[name] = Bottle.pop());
-    };
-    
-    /**
      * Get a service stored under a nested key
      *
      * @param String fullname
@@ -59,6 +112,21 @@
      */
     var getNestedService = function getNestedService(fullname) {
         return fullname.split('.').reduce(getNested, this);
+    };
+    
+    /**
+     * A helper function for pushing middleware and decorators onto their stacks.
+     *
+     * @param Array collection
+     * @param String name
+     * @param Function func
+     */
+    var set = function set(collection, id, name, func) {
+        if (typeof name === 'function') {
+            func = name;
+            name = '__global__';
+        }
+        get(collection, id, name).push(func);
     };
     
     /**
@@ -85,31 +153,30 @@
     };
     
     /**
+     * Map of decorator by index => name
+     *
+     * @type Object
+     */
+    var decorators = [];
+    
+    /**
      * Register decorator.
      *
-     * @param String fullname
+     * @param String name
      * @param Function func
      * @return Bottle
      */
-    var decorator = function decorator(fullname, func) {
-        var parts, name;
-        if (typeof fullname === 'function') {
-            func = fullname;
-            fullname = '__global__';
-        }
-    
-        parts = fullname.split('.');
-        name = parts.shift();
-        if (parts.length) {
-            getNestedBottle.call(this, name).decorator(parts.join('.'), func);
-        } else {
-            if (!this.decorators[name]) {
-                this.decorators[name] = [];
-            }
-            this.decorators[name].push(func);
-        }
+    var decorator = function decorator(name, func) {
+        set(decorators, this.id, name, func);
         return this;
     };
+    
+    /**
+     * Map of deferred functions by id => name
+     *
+     * @type Object
+     */
+    var deferred = [];
     
     /**
      * Register a function that will be executed when Bottle#resolve is called.
@@ -118,7 +185,7 @@
      * @return Bottle
      */
     var defer = function defer(func) {
-        this.deferred.push(func);
+        set(deferred, this.id, func);
         return this;
     };
     
@@ -180,6 +247,13 @@
     };
     
     /**
+     * Map of middleware by index => name
+     *
+     * @type Object
+     */
+    var middles = [];
+    
+    /**
      * Function used by provider to set up middleware for each request.
      *
      * @param Number id
@@ -188,7 +262,8 @@
      * @param Object container
      * @return void
      */
-    var applyMiddleware = function applyMiddleware(middleware, name, instance, container) {
+    var applyMiddleware = function applyMiddleware(id, name, instance, container) {
+        var middleware = getAllWithMapped(middles, id, name);
         var descriptor = {
             configurable : true,
             enumerable : true
@@ -224,23 +299,8 @@
      * @param Function func
      * @return Bottle
      */
-    var middleware = function middleware(fullname, func) {
-        var parts, name;
-        if (typeof fullname === 'function') {
-            func = fullname;
-            fullname = '__global__';
-        }
-    
-        parts = fullname.split('.');
-        name = parts.shift();
-        if (parts.length) {
-            getNestedBottle.call(this, name).middleware(parts.join('.'), func);
-        } else {
-            if (!this.middlewares[name]) {
-                this.middlewares[name] = [];
-            }
-            this.middlewares[name].push(func);
-        }
+    var middleware = function middleware(name, func) {
+        set(middles, this.id, name, func);
         return this;
     };
     
@@ -274,15 +334,18 @@
     };
     
     /**
-     * Clear all named bottles.
+     * Map of nested bottles by index => name
+     *
+     * @type Array
      */
-    var clear = function clear(name) {
-        if (name) {
-            delete bottles[name];
-        } else {
-            bottles = {};
-        }
-    };
+    var nestedBottles = [];
+    
+    /**
+     * Map of provider constructors by index => name
+     *
+     * @type Array
+     */
+    var providerMap = [];
     
     /**
      * Used to process decorators in the provider
@@ -303,29 +366,18 @@
      * @return Bottle
      */
     var provider = function provider(fullname, Provider) {
-        var parts, name;
+        var parts, providers, name, factory;
+        providers = get(providerMap, this.id);
         parts = fullname.split('.');
-        if (this.providerMap[fullname] && parts.length === 1 && !this.container[fullname + 'Provider']) {
+        if (providers[fullname] && parts.length === 1 && !this.container[fullname + 'Provider']) {
             return console.error(fullname + ' provider already instantiated.');
         }
-        this.providerMap[fullname] = true;
+        providers[fullname] = true;
     
         name = parts.shift();
+        factory = parts.length ? createSubProvider : createProvider;
     
-        if (parts.length) {
-            createSubProvider.call(this, name, Provider, parts);
-            return this;
-        }
-        return createProvider.call(this, name, Provider);
-    };
-    
-    /**
-     * Get decorators and middleware including globals
-     *
-     * @return array
-     */
-    var getWithGlobal = function getWithGlobal(collection, name) {
-        return (collection[name] || []).concat(collection.__global__ || []);
+        return factory.call(this, name, Provider, fullname, parts);
     };
     
     /**
@@ -337,12 +389,10 @@
      * @return Bottle
      */
     var createProvider = function createProvider(name, Provider) {
-        var providerName, properties, container, id, decorators, middlewares;
+        var providerName, properties, container, id;
     
         id = this.id;
         container = this.container;
-        decorators = this.decorators;
-        middlewares = this.middlewares;
         providerName = name + 'Provider';
     
         properties = Object.create(null);
@@ -365,13 +415,13 @@
                 var instance;
                 if (provider) {
                     // filter through decorators
-                    instance = getWithGlobal(decorators, name).reduce(reducer, provider.$get(container));
+                    instance = getAllWithMapped(decorators, id, name)
+                        .reduce(reducer, provider.$get(container));
     
                     delete container[providerName];
                     delete container[name];
                 }
-                return instance === undefined ? instance : applyMiddleware(getWithGlobal(middlewares, name),
-                    name, instance, container);
+                return instance === undefined ? instance : applyMiddleware(id, name, instance, container);
             }
         };
     
@@ -385,16 +435,25 @@
      *
      * @param String name
      * @param Function Provider
+     * @param String fullname
      * @param Array parts
      * @return Bottle
      */
-    var createSubProvider = function createSubProvider(name, Provider, parts) {
-        var bottle;
-        bottle = getNestedBottle.call(this, name);
-        this.factory(name, function SubProviderFactory() {
-            return bottle.container;
-        });
-        return bottle.provider(parts.join('.'), Provider);
+    var createSubProvider = function createSubProvider(name, Provider, fullname, parts) {
+        var bottle, bottles, subname, id;
+    
+        id = this.id;
+        bottles = get(nestedBottles, id);
+        bottle = bottles[name];
+        if (!bottle) {
+            this.container[name] = (bottle = bottles[name] = Bottle.pop()).container;
+        }
+        subname = parts.join('.');
+        bottle.provider(subname, Provider);
+    
+        set(fullnameMap, bottle.id, subname, { fullname : fullname, id : id });
+    
+        return this;
     };
     
     /**
@@ -425,7 +484,7 @@
      * @return Bottle
      */
     var resolve = function resolve(data) {
-        this.deferred.forEach(function deferredIterator(func) {
+        get(deferred, this.id, '__global__').forEach(function deferredIterator(func) {
             func(data);
         });
     
@@ -511,12 +570,6 @@
         }
     
         this.id = id++;
-    
-        this.decorators = {};
-        this.middlewares = {};
-        this.nested = {};
-        this.providerMap = {};
-        this.deferred = [];
         this.container = {
             $register : register.bind(this),
             $list : list.bind(this)
@@ -546,7 +599,6 @@
      * Bottle static
      */
     Bottle.pop = pop;
-    Bottle.clear = clear;
     Bottle.list = list;
     
     /**
