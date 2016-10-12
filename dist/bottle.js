@@ -276,8 +276,12 @@
     /**
      * Clear all named bottles.
      */
-    var clear = function clear() {
-        bottles = {};
+    var clear = function clear(name) {
+        if (name) {
+            delete bottles[name];
+        } else {
+            bottles = {};
+        }
     };
     
     /**
@@ -510,13 +514,13 @@
     
         this.decorators = {};
         this.middlewares = {};
+        this.nested = {};
         this.providerMap = {};
         this.deferred = [];
         this.container = {
             $register : register.bind(this),
             $list : list.bind(this)
         };
-        this.nested = {};
     };
     
     /**
