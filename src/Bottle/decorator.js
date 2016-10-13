@@ -15,7 +15,7 @@ var decorator = function decorator(fullname, func) {
     parts = fullname.split('.');
     name = parts.shift();
     if (parts.length) {
-        getNestedBottle(name, this.id).decorator(parts.join('.'), func);
+        getNestedBottle.call(this, name).decorator(parts.join('.'), func);
     } else {
         if (!this.decorators[name]) {
             this.decorators[name] = [];

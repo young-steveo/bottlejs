@@ -14,13 +14,6 @@ var id = 0;
 var slice = Array.prototype.slice;
 
 /**
- * Map of nested bottles by index => name
- *
- * @type Array
- */
-var nestedBottles = [];
-
-/**
  * Iterator used to walk down a nested object.
  *
  * If Bottle.config.strict is true, this method will throw an exception if it encounters an
@@ -40,18 +33,13 @@ var getNested = function getNested(obj, prop) {
 };
 
 /**
- * Get a nested bottle from nestedBottles.  Will set and return if not set.
+ * Get a nested bottle. Will set and return if not set.
  *
  * @param String name
  * @return Bottle
  */
-var getNestedBottle = function getNestedBottle(name, id) {
-    var bottles = nestedBottles[id];
-    if (!bottles) {
-        bottles = nestedBottles[id] = {};
-    }
-
-    return bottles[name] || (bottles[name] = Bottle.pop());
+var getNestedBottle = function getNestedBottle(name) {
+    return this.nested[name] || (this.nested[name] = Bottle.pop());
 };
 
 /**

@@ -26,3 +26,14 @@ var pop = function pop(name) {
     }
     return new Bottle();
 };
+
+/**
+ * Clear all named bottles.
+ */
+var clear = function clear(name) {
+    if (name) {
+        delete bottles[name];
+    } else {
+        bottles = {};
+    }
+};

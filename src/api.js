@@ -13,6 +13,7 @@ var Bottle = function Bottle(name) {
 
     this.decorators = {};
     this.middlewares = {};
+    this.nested = {};
     this.providerMap = {};
     this.deferred = [];
     this.container = {
@@ -44,6 +45,7 @@ Bottle.prototype = {
  * Bottle static
  */
 Bottle.pop = pop;
+Bottle.clear = clear;
 Bottle.list = list;
 
 /**

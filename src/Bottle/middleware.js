@@ -53,7 +53,7 @@ var middleware = function middleware(fullname, func) {
     parts = fullname.split('.');
     name = parts.shift();
     if (parts.length) {
-        getNestedBottle(name, this.id).middleware(parts.join('.'), func);
+        getNestedBottle.call(this, name).middleware(parts.join('.'), func);
     } else {
         if (!this.middlewares[name]) {
             this.middlewares[name] = [];

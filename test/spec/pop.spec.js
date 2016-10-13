@@ -17,6 +17,19 @@
             expect(Bottle.pop('Pop')).toBe(Bottle.pop('Pop'));
             expect(Bottle.pop('Soda')).not.toBe(Bottle.pop('Pop'));
         });
+        it('will not return the same instance with the same name after #clear', function() {
+            var instance = Bottle.pop('Soda');
+            expect(Bottle.pop('Soda')).toBe(instance);
+            Bottle.clear();
+            expect(Bottle.pop('Soda')).not.toBe(instance);
+        });
+        it('will return the same instance when another named instance is cleared', function() {
+            var instance = Bottle.pop('Soda');
+            Bottle.pop('Pop');
+            expect(Bottle.pop('Soda')).toBe(instance);
+            Bottle.clear('Pop');
+            expect(Bottle.pop('Soda')).toBe(instance);
+        });
         it('will not have name if not passed a name parameter', function() {
             var bottle = Bottle.pop();
             expect(bottle.container.BOTTLE_NAME).toBe(undefined);

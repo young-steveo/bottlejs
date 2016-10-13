@@ -218,6 +218,16 @@ Param                      | Type       | Details
 :--------------------------|:-----------|:--------
 **name**<br />*(optional)* | *String*   | The name of the bottle. If passed, bottle will store the instance internally and return the same instance if `Bottle.pop` is subsequently called with the same name.
 
+#### clear(name)
+
+Removes the named instance from bottle's internal store, if it exists. The immediately subsequent call to `Bottle.pop(name)` will return a new instance. If no name is given, all named instances will be cleared.
+
+In general, this function should only be called in situations where you intend to reset the bottle instance with new providers, decorators, etc. such as test setup.
+
+Param                      | Type       | Details
+:--------------------------|:-----------|:--------
+**name**<br />*(optional)* | *String*   | The name of the bottle. If passed, bottle will remove the internal instance, if such a bottle was created using `Bottle.pop`. If not passed, all named internal instances will be cleared.
+
 #### list(container)
 #### prototype.list()
 #### prototype.container.$list()
