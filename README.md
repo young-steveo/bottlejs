@@ -196,7 +196,21 @@ bottle.middleware('Beer', function(beer, next) {
 ```
 
 ## Nested Bottles
-Bottle will generate nested containers if dot notation is used in the service name.  A sub container will be created for you based on the name given:
+Bottle will generate nested containers if dot notation is used in the service name.  An isolated sub container will be created for you based on the name given:
+
+```js
+var bottle = new Bottle();
+var IPA = function() {};
+bottle.service('Beer.IPA', IPA);
+bottle.container.Beer; // this is a new Bottle.container object
+bottle.container.Beer.IPA; // the service
+bottle.factory('Beer.DoubleIPA', function (container) {
+    var IPA = container.IPA; // note the container in here is the nearest parent.
+})
+```
+
+### Nested Containers Are Isolated
+Nested containers are designed to provide isolation between different packages.  This means that you cannot access a nested container from a different parent when you are writing a factory.
 
 ```js
 var bottle = new Bottle();
