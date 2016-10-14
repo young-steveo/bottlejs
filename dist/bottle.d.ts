@@ -39,7 +39,7 @@ declare class Bottle {
     /**
      * List the services registered on the container
      */
-     list(container?: Bottle.IContainer): Array<string>;
+    list(container?: Bottle.IContainer): Array<string>;
 
     /**
      * Register a middleware function. This function will be executed every time the service is accessed.
