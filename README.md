@@ -264,6 +264,26 @@ Property   | Type      | Default | Details
 
 ### Bottle.prototype
 
+#### decorators
+
+A collection of decorators registered by the bottle instance.  See `decorator(name, func)` below
+
+#### middlewares
+
+A collection of middleware registered by the bottle instance.  See `middleware(name, func)` below.
+
+#### nested
+
+A collection of nested bottles registered by the parent bottle instance when dot notation is used to define a service.  See "Nested Bottles" section in the documentation above.
+
+#### providerMap
+
+A collection of registered provider names.  Bottle uses this internally to determine whether a provider has already instantiated it's instance.  See `provider(name, Provider)` below.
+
+#### deferred
+
+An array of deferred functions registered for this bottle instance.  See `defer(func)` below.
+
 #### constant(name, value)
 
 Used to add a read only value to the container.
