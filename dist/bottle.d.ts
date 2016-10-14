@@ -1,8 +1,14 @@
 declare class Bottle {
-    static pop: (name?: string) => Bottle
+    static pop: (name?: string) => Bottle;
+    static clear: (name?: string) => void;
     static config: Object;
 
     public container: Bottle.IContainer;
+    public decorators: Object;
+    public middlewares: Object;
+    public nested: Object;
+    public providerMap: Object;
+    public deferred: Array<(data: any) => any>;
 
     constructor(name?: string);
 
@@ -86,5 +92,6 @@ declare module Bottle {
 
     interface IContainer {
         $register(Obj: Bottle.IRegisterableObject): this;
+        $list(container?: Bottle.IContainer): Array<string>;
     }
 }
