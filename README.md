@@ -221,9 +221,13 @@ Nested containers are designed to provide isolation between different packages. 
 ```js
 var bottle = new Bottle();
 var IPA = function() {};
-bottle.service('Beer.IPA', IPA);
-bottle.container.Beer; // this is a new Bottle.container object
-bottle.container.Beer.IPA; // the service
+var Wort = function() {};
+bottle.service('Ingredients.Wort', Wort);
+bottle.factory('Beer.IPA', function(container) {
+    // container is `Beer`, not the root, so:
+    container.Wort; // undefined
+    container.Ingredients.Wort; // undefined
+});
 ```
 
 ## API
