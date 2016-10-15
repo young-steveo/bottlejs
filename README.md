@@ -38,6 +38,12 @@ $ bower install bottlejs
 $ npm install bottlejs
 ```
 
+BottleJS is also available on cdnjs:
+
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bottlejs/1.4.0/bottle.min.js"></script>
+```
+
 ## Simple Example
 
 The simplest recipe to get started with is `Bottle#service`.  Say you have a constructor for a service object:
