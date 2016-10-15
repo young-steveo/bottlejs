@@ -38,6 +38,12 @@ $ bower install bottlejs
 $ npm install bottlejs
 ```
 
+BottleJS is also available on cdnjs:
+
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bottlejs/1.4.0/bottle.min.js"></script>
+```
+
 ## Simple Example
 
 The simplest recipe to get started with is `Bottle#service`.  Say you have a constructor for a service object:
@@ -196,7 +202,7 @@ bottle.middleware('Beer', function(beer, next) {
 ```
 
 ## Nested Bottles
-Bottle will generate nested containers if dot notation is used in the service name.  A sub container will be created for you based on the name given:
+Bottle will generate nested containers if dot notation is used in the service name.  An isolated sub container will be created for you based on the name given:
 
 ```js
 var bottle = new Bottle();
@@ -204,6 +210,24 @@ var IPA = function() {};
 bottle.service('Beer.IPA', IPA);
 bottle.container.Beer; // this is a new Bottle.container object
 bottle.container.Beer.IPA; // the service
+bottle.factory('Beer.DoubleIPA', function (container) {
+    var IPA = container.IPA; // note the container in here is the nearest parent.
+})
+```
+
+### Nested Containers Are Isolated
+Nested containers are designed to provide isolation between different packages.  This means that you cannot access a nested container from a different parent when you are writing a factory.
+
+```js
+var bottle = new Bottle();
+var IPA = function() {};
+var Wort = function() {};
+bottle.service('Ingredients.Wort', Wort);
+bottle.factory('Beer.IPA', function(container) {
+    // container is `Beer`, not the root, so:
+    container.Wort; // undefined
+    container.Ingredients.Wort; // undefined
+});
 ```
 
 ## API
@@ -249,6 +273,26 @@ Property   | Type      | Default | Details
 **strict** | *Boolean* | `false` | Enables strict mode.  Currently only verifies that automatically injected dependencies are not undefined.
 
 ### Bottle.prototype
+
+#### decorators
+
+A collection of decorators registered by the bottle instance.  See `decorator(name, func)` below
+
+#### middlewares
+
+A collection of middleware registered by the bottle instance.  See `middleware(name, func)` below.
+
+#### nested
+
+A collection of nested bottles registered by the parent bottle instance when dot notation is used to define a service.  See "Nested Bottles" section in the documentation above.
+
+#### providerMap
+
+A collection of registered provider names.  Bottle uses this internally to determine whether a provider has already instantiated it's instance.  See `provider(name, Provider)` below.
+
+#### deferred
+
+An array of deferred functions registered for this bottle instance.  See `defer(func)` below.
 
 #### constant(name, value)
 

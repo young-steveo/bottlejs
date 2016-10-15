@@ -1,8 +1,14 @@
 declare class Bottle {
-    static pop: (name?: string) => Bottle
+    static pop: (name?: string) => Bottle;
+    static clear: (name?: string) => void;
     static config: Object;
 
     public container: Bottle.IContainer;
+    public decorators: Object;
+    public middlewares: Object;
+    public nested: Object;
+    public providerMap: Object;
+    public deferred: Array<(data: any) => any>;
 
     constructor(name?: string);
 
@@ -39,7 +45,7 @@ declare class Bottle {
     /**
      * List the services registered on the container
      */
-     list(container?: Bottle.IContainer): Array<string>;
+    list(container?: Bottle.IContainer): Array<string>;
 
     /**
      * Register a middleware function. This function will be executed every time the service is accessed.
@@ -86,5 +92,6 @@ declare module Bottle {
 
     interface IContainer {
         $register(Obj: Bottle.IRegisterableObject): this;
+        $list(container?: Bottle.IContainer): Array<string>;
     }
 }
