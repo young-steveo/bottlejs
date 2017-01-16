@@ -380,6 +380,10 @@ Param        | Type       | Details
 **name**     | *String*   | The name of the service.  Must be unique to each Bottle instance.
 **Provider** | *Function* | A constructor function that will be instantiated as a singleton.  Should expose a function called `$get` that will be used as a factory to instantiate the service.
 
+#### resetProviders()
+
+Used to reset all containers for the next reference to reinstantiate the provider.
+
 #### register(Obj)
 #### container.$register(Obj)
 
