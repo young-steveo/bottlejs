@@ -15,6 +15,7 @@ var Bottle = function Bottle(name) {
     this.middlewares = {};
     this.nested = {};
     this.providerMap = {};
+    this.originalProviders = {};
     this.deferred = [];
     this.container = {
         $register : register.bind(this),
@@ -35,6 +36,7 @@ Bottle.prototype = {
     list : list,
     middleware : middleware,
     provider : provider,
+    resetProviders : resetProviders,
     register : register,
     resolve : resolve,
     service : service,

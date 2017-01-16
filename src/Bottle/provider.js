@@ -22,6 +22,7 @@ var provider = function provider(fullname, Provider) {
     if (this.providerMap[fullname] && parts.length === 1 && !this.container[fullname + 'Provider']) {
         return console.error(fullname + ' provider already instantiated.');
     }
+    this.originalProviders[fullname] = Provider;
     this.providerMap[fullname] = true;
 
     name = parts.shift();
@@ -91,6 +92,25 @@ var createProvider = function createProvider(name, Provider) {
 
     Object.defineProperties(container, properties);
     return this;
+};
+
+var removeProviderMap = function resetProvider(name) {
+    this.providerMap[name] = false;
+    delete this.container[name];
+    delete this.container[name + 'Provider'];
+};
+
+var resetProviders = function resetProviders() {
+    var providers = this.originalProviders;
+    Object.keys(providers).forEach(function(provider) {
+        var parts = provider.split('.');
+        if (parts.length > 1) {
+            removeProviderMap.call(this, parts[0]);
+            parts.forEach(removeProviderMap.bind(getNestedBottle.call(this, parts[0])));
+        }
+        removeProviderMap.call(this, provider);
+        this.provider(provider, providers[provider]);
+    }.bind(this));
 };
 
 /**
