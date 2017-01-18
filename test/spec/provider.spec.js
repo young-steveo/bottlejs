@@ -146,4 +146,30 @@
             expect(b.container.Zero).toBe(0);
         });
     });
+    describe('Bottle#resetProviders', function() {
+        it('allows for already instantiated providers to be reset back to their registry', function() {
+            var i = 0;
+            var b = new Bottle();
+            var ThingProvider = function() { i = ++i; this.$get = function() { return this; }; };
+            b.provider('Thing', ThingProvider);
+            expect(b.container.Thing instanceof ThingProvider).toBe(true);
+            // Intentionally calling twice to prove the construction is cached until reset
+            expect(b.container.Thing instanceof ThingProvider).toBe(true);
+            b.resetProviders();
+            expect(b.container.Thing instanceof ThingProvider).toBe(true);
+            expect(i).toEqual(2);
+        });
+        it('allows for sub containers to re-initiate as well', function() {
+            var i = 0;
+            var b = new Bottle();
+            var ThingProvider = function() { i = ++i; this.$get = function() { return this; }; };
+            b.provider('Thing.Something', ThingProvider);
+            expect(b.container.Thing.Something instanceof ThingProvider).toBe(true);
+            // Intentionally calling twice to prove the construction is cached until reset
+            expect(b.container.Thing.Something instanceof ThingProvider).toBe(true);
+            b.resetProviders();
+            expect(b.container.Thing.Something instanceof ThingProvider).toBe(true);
+            expect(i).toEqual(2);
+        });
+    });
 }());
