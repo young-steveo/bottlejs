@@ -95,7 +95,7 @@ var createProvider = function createProvider(name, Provider) {
 };
 
 var removeProviderMap = function resetProvider(name) {
-    this.providerMap[name] = false;
+    delete this.providerMap[name];
     delete this.container[name];
     delete this.container[name + 'Provider'];
 };
