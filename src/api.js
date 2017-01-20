@@ -18,6 +18,7 @@ var Bottle = function Bottle(name) {
     this.originalProviders = {};
     this.deferred = [];
     this.container = {
+        $decorator : decorator.bind(this),
         $register : register.bind(this),
         $list : list.bind(this)
     };

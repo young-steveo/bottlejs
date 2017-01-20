@@ -46,7 +46,6 @@ var getWithGlobal = function getWithGlobal(collection, name) {
 /**
  * Create the provider properties on the container
  *
- * @param String fullname
  * @param String name
  * @param Function Provider
  * @return Bottle
