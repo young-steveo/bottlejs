@@ -16,7 +16,7 @@ var bottles = {};
  */
 var pop = function pop(name) {
     var instance;
-    if (typeof name === "string") {
+    if (typeof name === 'string') {
         instance = bottles[name];
         if (!instance) {
             bottles[name] = instance = new Bottle();
@@ -31,7 +31,7 @@ var pop = function pop(name) {
  * Clear all named bottles.
  */
 var clear = function clear(name) {
-    if (typeof name === "string") {
+    if (typeof name === 'string') {
         delete bottles[name];
     } else {
         bottles = {};
