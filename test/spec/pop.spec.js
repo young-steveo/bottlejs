@@ -38,5 +38,9 @@
             var bottle = Bottle.pop('Soda');
             expect(bottle.container.BOTTLE_NAME).toBe('Soda');
         });
+        it('will return the same instance when a name is passed, even if the string == false', function() {
+            expect(Bottle.pop('')).toBe(Bottle.pop(''));
+            expect(Bottle.pop('0')).toBe(Bottle.pop('0'));
+        });
     });
 }());
