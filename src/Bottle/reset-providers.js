@@ -1,9 +1,15 @@
+/**
+ * Deletes providers from the map and container.
+ */
 var removeProviderMap = function resetProvider(name) {
     delete this.providerMap[name];
     delete this.container[name];
     delete this.container[name + 'Provider'];
 };
 
+/**
+ * Resets all providers on a bottle instance.
+ */
 var resetProviders = function resetProviders() {
     var providers = this.originalProviders;
     Object.keys(providers).forEach(function(provider) {
