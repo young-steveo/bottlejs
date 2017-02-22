@@ -1,10 +1,10 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v1.5.0 - 2016-10-14
+     * BottleJS v1.6.0 - 2017-02-22
      * A powerful dependency injection micro container
      *
-     * Copyright (c) 2016 Stephen Young
+     * Copyright (c) 2017 Stephen Young
      * Licensed MIT
      */
     
@@ -166,7 +166,7 @@
      * A filter function for removing bottle container methods and providers from a list of keys
      */
     var byMethod = function byMethod(name) {
-        return !/^\$(?:register|list)$|Provider$/.test(name);
+        return !/^\$(?:decorator|register|list)$|Provider$/.test(name);
     };
     
     /**
@@ -262,7 +262,7 @@
      */
     var pop = function pop(name) {
         var instance;
-        if (name) {
+        if (typeof name === 'string') {
             instance = bottles[name];
             if (!instance) {
                 bottles[name] = instance = new Bottle();
@@ -277,7 +277,7 @@
      * Clear all named bottles.
      */
     var clear = function clear(name) {
-        if (name) {
+        if (typeof name === 'string') {
             delete bottles[name];
         } else {
             bottles = {};
@@ -308,6 +308,7 @@
         if (this.providerMap[fullname] && parts.length === 1 && !this.container[fullname + 'Provider']) {
             return console.error(fullname + ' provider already instantiated.');
         }
+        this.originalProviders[fullname] = Provider;
         this.providerMap[fullname] = true;
     
         name = parts.shift();
@@ -331,7 +332,6 @@
     /**
      * Create the provider properties on the container
      *
-     * @param String fullname
      * @param String name
      * @param Function Provider
      * @return Bottle
@@ -377,6 +377,25 @@
     
         Object.defineProperties(container, properties);
         return this;
+    };
+    
+    var removeProviderMap = function resetProvider(name) {
+        delete this.providerMap[name];
+        delete this.container[name];
+        delete this.container[name + 'Provider'];
+    };
+    
+    var resetProviders = function resetProviders() {
+        var providers = this.originalProviders;
+        Object.keys(providers).forEach(function(provider) {
+            var parts = provider.split('.');
+            if (parts.length > 1) {
+                removeProviderMap.call(this, parts[0]);
+                parts.forEach(removeProviderMap.bind(getNestedBottle.call(this, parts[0])));
+            }
+            removeProviderMap.call(this, provider);
+            this.provider(provider, providers[provider]);
+        }.bind(this));
     };
     
     /**
@@ -516,8 +535,10 @@
         this.middlewares = {};
         this.nested = {};
         this.providerMap = {};
+        this.originalProviders = {};
         this.deferred = [];
         this.container = {
+            $decorator : decorator.bind(this),
             $register : register.bind(this),
             $list : list.bind(this)
         };
@@ -536,6 +557,7 @@
         list : list,
         middleware : middleware,
         provider : provider,
+        resetProviders : resetProviders,
         register : register,
         resolve : resolve,
         service : service,
