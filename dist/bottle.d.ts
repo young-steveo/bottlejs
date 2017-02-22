@@ -1,6 +1,7 @@
 declare class Bottle {
     static pop: (name?: string) => Bottle;
     static clear: (name?: string) => void;
+    static list: (container?: Bottle.IContainer) => Array<string>;
     static config: Object;
 
     public container: Bottle.IContainer;
@@ -59,6 +60,11 @@ declare class Bottle {
     provider(name: string, Provider: ((...any: any[]) => void)): this;
 
     /**
+     * Reset providers on the bottle instance.
+     */
+    resetProviders(): void;
+
+    /**
      * Register a service, factory, provider, or value based on properties of the Obj.
      */
     register(Obj: Bottle.IRegisterableObject): this;
@@ -91,6 +97,7 @@ declare module Bottle {
     }
 
     interface IContainer {
+        $decorator(name: string|((service: any) => any), func?: (service: any) => any): this;
         $register(Obj: Bottle.IRegisterableObject): this;
         $list(container?: Bottle.IContainer): Array<string>;
     }

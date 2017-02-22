@@ -41,8 +41,9 @@ $ npm install bottlejs
 BottleJS is also available on cdnjs:
 
 ```html
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bottlejs/1.4.0/bottle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bottlejs/VERSION/bottle.min.js"></script>
 ```
+Replace `VERSION` in the above URL with a valid BottleJS version, e.g. `https://cdnjs.cloudflare.com/ajax/libs/bottlejs/1.5.0/bottle.min.js`
 
 ## Simple Example
 
@@ -304,8 +305,9 @@ Param     | Type       | Details
 **value** | *Mixed*    | A value that will be defined as enumerable, but not writable.
 
 #### decorator(name, func)
+#### container.$decorator(name, func)
 
-Used to register a decorator function that the provider will use to modify your services at creation time.
+Used to register a decorator function that the provider will use to modify your services at creation time. `bottle.container.$decorator` is an alias of `bottle.decorator`; this allows you to only add a decorator to a nested bottle.
 
 Param                      | Type       | Details
 :--------------------------|:-----------|:--------
