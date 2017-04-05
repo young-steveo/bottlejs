@@ -129,7 +129,7 @@ bottle.provider('Beer', function() {
     // This environment may not support water.
     // We should polyfill it.
     if (waterNotSupported) {
-        Beer.pollyfillWater();
+        Beer.polyfillWater();
     }
 
     // this is the service factory.
