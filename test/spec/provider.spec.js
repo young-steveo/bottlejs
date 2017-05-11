@@ -171,5 +171,14 @@
             expect(b.container.Thing.Something instanceof ThingProvider).toBe(true);
             expect(i).toEqual(2);
         });
+        it('allows for services with dependencies to be re-initiated', function() {
+            var b = new Bottle();
+            var Thing = function Thing () {};
+            b.service('Thing', Thing, 'Dep');
+            b.service('Dep', function Dep () {});
+            expect(b.container.Thing instanceof Thing).toBe(true);
+            b.resetProviders();
+            expect(b.container.Thing instanceof Thing).toBe(true);
+        });
     });
 }());
