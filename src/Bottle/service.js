@@ -10,9 +10,9 @@ var service = function service(name, Service) {
     var bottle = this;
     return factory.call(this, name, function GenericFactory() {
         if (deps) {
-            deps = deps.map(getNestedService, bottle.container);
-            deps.unshift(Service);
-            Service = Service.bind.apply(Service, deps);
+            var args = deps.map(getNestedService, bottle.container);
+            args.unshift(Service);
+            Service = Service.bind.apply(Service, args);
         }
         return new Service();
     });
