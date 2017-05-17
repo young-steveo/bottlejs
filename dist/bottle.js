@@ -1,7 +1,7 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v1.6.0 - 2017-02-22
+     * BottleJS v1.6.1 - 2017-05-17
      * A powerful dependency injection micro container
      *
      * Copyright (c) 2017 Stephen Young
@@ -473,12 +473,13 @@
         var deps = arguments.length > 2 ? slice.call(arguments, 2) : null;
         var bottle = this;
         return factory.call(this, name, function GenericFactory() {
+            var ServiceCopy = Service;
             if (deps) {
-                deps = deps.map(getNestedService, bottle.container);
-                deps.unshift(Service);
-                Service = Service.bind.apply(Service, deps);
+                var args = deps.map(getNestedService, bottle.container);
+                args.unshift(Service);
+                ServiceCopy = Service.bind.apply(Service, args);
             }
-            return new Service();
+            return new ServiceCopy();
         });
     };
     
