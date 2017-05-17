@@ -171,5 +171,21 @@
             expect(b.container.Thing.Something instanceof ThingProvider).toBe(true);
             expect(i).toEqual(2);
         });
+        it('allows for services with dependencies to be re-initiated with fresh instances', function() {
+            var i = 0;
+            var b = new Bottle();
+            var Thing = function(dep) { this.dep = dep; };
+            var Dep = function() { this.i = ++i; };
+            var dep1 = new Dep();
+            var dep2 = new Dep();
+            var depStack = [dep1, dep2];
+            b.service('Thing', Thing, 'Dep');
+            b.factory('Dep', function() { return depStack.shift(); });
+            expect(b.container.Thing instanceof Thing).toBe(true);
+            expect(b.container.Thing.dep).toBe(dep1);
+            b.resetProviders();
+            expect(b.container.Thing instanceof Thing).toBe(true);
+            expect(b.container.Thing.dep).toBe(dep2);
+        });
     });
 }());
