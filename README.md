@@ -43,7 +43,7 @@ BottleJS is also available on cdnjs:
 ```html
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bottlejs/VERSION/bottle.min.js"></script>
 ```
-Replace `VERSION` in the above URL with a valid BottleJS version, e.g. `https://cdnjs.cloudflare.com/ajax/libs/bottlejs/1.5.0/bottle.min.js`
+Replace `VERSION` in the above URL with a valid BottleJS version, e.g. `https://cdnjs.cloudflare.com/ajax/libs/bottlejs/1.6.1/bottle.min.js`
 
 ## Simple Example
 
