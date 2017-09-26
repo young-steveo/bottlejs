@@ -78,6 +78,7 @@ declare class Bottle {
      * Register a service constructor. If Bottle.config.strict is set to true, this method will throw an error if an injected dependency is undefined.
      */
     service(name: string, Constructor: ((...any: any[]) => any), ...dependency: string[]): this;
+    service<T>(name: string, Constructor: new (...any: any[]) => T, ...dependency: string[]): this;
 
     /**
      * Add an arbitrary value to the container.
