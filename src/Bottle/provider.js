@@ -105,8 +105,5 @@ var createProvider = function createProvider(name, Provider) {
 var createSubProvider = function createSubProvider(name, Provider, parts) {
     var bottle;
     bottle = getNestedBottle.call(this, name);
-    this.factory(name, function SubProviderFactory() {
-        return bottle.container;
-    });
     return bottle.provider(parts.join('.'), Provider);
 };

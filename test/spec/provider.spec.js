@@ -123,6 +123,18 @@
             expect(b.container.Util.ThingProvider).toBeDefined();
             expect(b.container.Util.Thing).toBeDefined();
         });
+        
+        it('does not log an error if a service is added to a nested bottle with initialized services', function() {
+            var b = new Bottle();
+            var Thing = function() {};
+            var ThingProvider = function() { this.$get = function() { return new Thing(); }; };
+            spyOn(console, 'error');
+            b.provider('Util.Thing', ThingProvider);
+            expect(b.container.Util.Thing).toBeDefined();
+            b.provider('Util.OtherThing', ThingProvider);
+            expect(b.container.Util.OtherThing).toBeDefined();
+            expect(console.error).not.toHaveBeenCalled();
+        });
 
         it('Allows falsey values returned by $get to remain defined when accessed multiple times', function() {
             var b = new Bottle();

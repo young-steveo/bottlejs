@@ -39,7 +39,15 @@ var getNested = function getNested(obj, prop) {
  * @return Bottle
  */
 var getNestedBottle = function getNestedBottle(name) {
-    return this.nested[name] || (this.nested[name] = Bottle.pop());
+    var bottle;
+    if (!this.nested[name]) {
+        bottle = Bottle.pop();
+        this.nested[name] = bottle;
+        this.factory(name, function SubProviderFactory() {
+            return bottle.container;
+        });
+    }
+    return this.nested[name];
 };
 
 /**
