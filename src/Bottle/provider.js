@@ -28,7 +28,7 @@ var provider = function provider(fullname, Provider) {
     name = parts.shift();
 
     if (parts.length) {
-        createSubProvider.call(this, name, Provider, parts);
+        getNestedBottle.call(this, name).provider(parts.join('.'), Provider);
         return this;
     }
     return createProvider.call(this, name, Provider);
@@ -91,19 +91,4 @@ var createProvider = function createProvider(name, Provider) {
 
     Object.defineProperties(container, properties);
     return this;
-};
-
-/**
- * Creates a bottle container on the current bottle container, and registers
- * the provider under the sub container.
- *
- * @param String name
- * @param Function Provider
- * @param Array parts
- * @return Bottle
- */
-var createSubProvider = function createSubProvider(name, Provider, parts) {
-    var bottle;
-    bottle = getNestedBottle.call(this, name);
-    return bottle.provider(parts.join('.'), Provider);
 };
