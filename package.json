@@ -1,6 +1,6 @@
 {
   "name": "bottlejs",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "A powerful dependency injection micro container",
   "main": "dist/bottle.js",
   "typings": "dist/bottle.d.ts",

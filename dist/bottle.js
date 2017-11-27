@@ -1,7 +1,7 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v1.6.1 - 2017-05-17
+     * BottleJS v1.6.2 - 2017-11-27
      * A powerful dependency injection micro container
      *
      * Copyright (c) 2017 Stephen Young
@@ -48,7 +48,15 @@
      * @return Bottle
      */
     var getNestedBottle = function getNestedBottle(name) {
-        return this.nested[name] || (this.nested[name] = Bottle.pop());
+        var bottle;
+        if (!this.nested[name]) {
+            bottle = Bottle.pop();
+            this.nested[name] = bottle;
+            this.factory(name, function SubProviderFactory() {
+                return bottle.container;
+            });
+        }
+        return this.nested[name];
     };
     
     /**
@@ -314,7 +322,7 @@
         name = parts.shift();
     
         if (parts.length) {
-            createSubProvider.call(this, name, Provider, parts);
+            getNestedBottle.call(this, name).provider(parts.join('.'), Provider);
             return this;
         }
         return createProvider.call(this, name, Provider);
@@ -377,24 +385,6 @@
     
         Object.defineProperties(container, properties);
         return this;
-    };
-    
-    /**
-     * Creates a bottle container on the current bottle container, and registers
-     * the provider under the sub container.
-     *
-     * @param String name
-     * @param Function Provider
-     * @param Array parts
-     * @return Bottle
-     */
-    var createSubProvider = function createSubProvider(name, Provider, parts) {
-        var bottle;
-        bottle = getNestedBottle.call(this, name);
-        this.factory(name, function SubProviderFactory() {
-            return bottle.container;
-        });
-        return bottle.provider(parts.join('.'), Provider);
     };
     
     /**
