@@ -1,7 +1,7 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v1.6.2 - 2017-11-27
+     * BottleJS v1.6.3 - 2017-12-06
      * A powerful dependency injection micro container
      *
      * Copyright (c) 2017 Stephen Young
@@ -429,7 +429,6 @@
         Object.keys(this.originalProviders).forEach(function resetPrvider(provider) {
             var parts = provider.split('.');
             if (parts.length > 1) {
-                removeProviderMap.call(this, parts[0]);
                 parts.forEach(removeProviderMap, getNestedBottle.call(this, parts[0]));
             }
             removeProviderMap.call(this, provider);
