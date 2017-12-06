@@ -183,6 +183,16 @@
             expect(b.container.Thing.Something instanceof ThingProvider).toBe(true);
             expect(i).toEqual(2);
         });
+        it('will not break if a nested container has multiple children', function() {
+            var b = new Bottle();
+            b.service('Thing.A', function() { this.name = 'A'; });
+            b.service('Thing.B', function() { this.name = 'B'; });
+            expect(b.container.Thing.A.name).toBe('A');
+            expect(b.container.Thing.B.name).toBe('B');
+            b.resetProviders();
+            expect(b.container.Thing.A.name).toBe('A');
+            expect(b.container.Thing.B.name).toBe('B');
+        });
         it('allows for services with dependencies to be re-initiated with fresh instances', function() {
             var i = 0;
             var b = new Bottle();

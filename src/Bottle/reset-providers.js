@@ -20,7 +20,6 @@ var resetProviders = function resetProviders() {
     Object.keys(this.originalProviders).forEach(function resetPrvider(provider) {
         var parts = provider.split('.');
         if (parts.length > 1) {
-            removeProviderMap.call(this, parts[0]);
             parts.forEach(removeProviderMap, getNestedBottle.call(this, parts[0]));
         }
         removeProviderMap.call(this, provider);
