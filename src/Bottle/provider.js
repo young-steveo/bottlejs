@@ -18,7 +18,7 @@ var reducer = function reducer(instance, func) {
  */
 var provider = function provider(fullname, Provider) {
     var parts, name;
-    parts = fullname.split('.');
+    parts = fullname.split(DELIMITER);
     if (this.providerMap[fullname] && parts.length === 1 && !this.container[fullname + 'Provider']) {
         return console.error(fullname + ' provider already instantiated.');
     }
@@ -28,7 +28,7 @@ var provider = function provider(fullname, Provider) {
     name = parts.shift();
 
     if (parts.length) {
-        getNestedBottle.call(this, name).provider(parts.join('.'), Provider);
+        getNestedBottle.call(this, name).provider(parts.join(DELIMITER), Provider);
         return this;
     }
     return createProvider.call(this, name, Provider);

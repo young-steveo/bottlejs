@@ -7,7 +7,7 @@
  */
 var value = function value(name, val) {
     var parts;
-    parts = name.split('.');
+    parts = name.split(DELIMITER);
     name = parts.pop();
     defineValue.call(parts.reduce(setValueObject, this.container), name, val);
     return this;
