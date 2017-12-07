@@ -2,6 +2,10 @@
  * String constants
  */
 var DELIMITER = '.';
+var FUNCTION_TYPE = 'function';
+var STRING_TYPE = 'string';
+var GLOBAL_NAME = '__global__';
+var PROVIDER_SUFFIX = 'Provider';
 
 /**
  * Unique id counter;

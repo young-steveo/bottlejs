@@ -19,7 +19,7 @@ var reducer = function reducer(instance, func) {
 var provider = function provider(fullname, Provider) {
     var parts, name;
     parts = fullname.split(DELIMITER);
-    if (this.providerMap[fullname] && parts.length === 1 && !this.container[fullname + 'Provider']) {
+    if (this.providerMap[fullname] && parts.length === 1 && !this.container[fullname + PROVIDER_SUFFIX]) {
         return console.error(fullname + ' provider already instantiated.');
     }
     this.originalProviders[fullname] = Provider;
@@ -57,7 +57,7 @@ var createProvider = function createProvider(name, Provider) {
     container = this.container;
     decorators = this.decorators;
     middlewares = this.middlewares;
-    providerName = name + 'Provider';
+    providerName = name + PROVIDER_SUFFIX;
 
     properties = Object.create(null);
     properties[providerName] = {

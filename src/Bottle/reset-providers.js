@@ -7,7 +7,7 @@
 var removeProviderMap = function resetProvider(name) {
     delete this.providerMap[name];
     delete this.container[name];
-    delete this.container[name + 'Provider'];
+    delete this.container[name + PROVIDER_SUFFIX];
 };
 
 /**

@@ -7,9 +7,9 @@
  */
 var decorator = function decorator(fullname, func) {
     var parts, name;
-    if (typeof fullname === 'function') {
+    if (typeof fullname === FUNCTION_TYPE) {
         func = fullname;
-        fullname = '__global__';
+        fullname = GLOBAL_NAME;
     }
 
     parts = fullname.split(DELIMITER);

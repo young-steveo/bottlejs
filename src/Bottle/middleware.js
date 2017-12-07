@@ -45,9 +45,9 @@ var applyMiddleware = function applyMiddleware(middleware, name, instance, conta
  */
 var middleware = function middleware(fullname, func) {
     var parts, name;
-    if (typeof fullname === 'function') {
+    if (typeof fullname === FUNCTION_TYPE) {
         func = fullname;
-        fullname = '__global__';
+        fullname = GLOBAL_NAME;
     }
 
     parts = fullname.split(DELIMITER);

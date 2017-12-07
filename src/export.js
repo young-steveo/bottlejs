@@ -50,7 +50,7 @@ var objectTypes = {
     /**
      * Export
      */
-    if (typeof define === 'function' && typeof define.amd === 'object' && define.amd) {
+    if (typeof define === FUNCTION_TYPE && typeof define.amd === 'object' && define.amd) {
         root.Bottle = Bottle;
         define(function() { return Bottle; });
     } else if (freeExports && freeModule) {
