@@ -1,3 +1,11 @@
+/**
+ * String constants
+ */
+var DELIMITER = '.';
+var FUNCTION_TYPE = 'function';
+var STRING_TYPE = 'string';
+var GLOBAL_NAME = '__global__';
+var PROVIDER_SUFFIX = 'Provider';
 
 /**
  * Unique id counter;
@@ -57,5 +65,5 @@ var getNestedBottle = function getNestedBottle(name) {
  * @return Service
  */
 var getNestedService = function getNestedService(fullname) {
-    return fullname.split('.').reduce(getNested, this);
+    return fullname.split(DELIMITER).reduce(getNested, this);
 };

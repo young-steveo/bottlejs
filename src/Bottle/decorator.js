@@ -7,15 +7,15 @@
  */
 var decorator = function decorator(fullname, func) {
     var parts, name;
-    if (typeof fullname === 'function') {
+    if (typeof fullname === FUNCTION_TYPE) {
         func = fullname;
-        fullname = '__global__';
+        fullname = GLOBAL_NAME;
     }
 
-    parts = fullname.split('.');
+    parts = fullname.split(DELIMITER);
     name = parts.shift();
     if (parts.length) {
-        getNestedBottle.call(this, name).decorator(parts.join('.'), func);
+        getNestedBottle.call(this, name).decorator(parts.join(DELIMITER), func);
     } else {
         if (!this.decorators[name]) {
             this.decorators[name] = [];

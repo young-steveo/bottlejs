@@ -7,7 +7,7 @@
 var removeProviderMap = function resetProvider(name) {
     delete this.providerMap[name];
     delete this.container[name];
-    delete this.container[name + 'Provider'];
+    delete this.container[name + PROVIDER_SUFFIX];
 };
 
 /**
@@ -18,7 +18,7 @@ var removeProviderMap = function resetProvider(name) {
 var resetProviders = function resetProviders() {
     var providers = this.originalProviders;
     Object.keys(this.originalProviders).forEach(function resetPrvider(provider) {
-        var parts = provider.split('.');
+        var parts = provider.split(DELIMITER);
         if (parts.length > 1) {
             parts.forEach(removeProviderMap, getNestedBottle.call(this, parts[0]));
         }

@@ -6,7 +6,7 @@
  * @return Bottle
  */
 var constant = function constant(name, value) {
-    var parts = name.split('.');
+    var parts = name.split(DELIMITER);
     name = parts.pop();
     defineConstant.call(parts.reduce(setValueObject, this.container), name, value);
     return this;
