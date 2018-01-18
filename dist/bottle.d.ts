@@ -98,6 +98,7 @@ declare module Bottle {
     }
 
     interface IContainer {
+        [key: string]: any;
         $decorator(name: string|((service: any) => any), func?: (service: any) => any): this;
         $register(Obj: Bottle.IRegisterableObject): this;
         $list(container?: Bottle.IContainer): Array<string>;
