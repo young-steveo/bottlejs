@@ -1,20 +1,31 @@
 /**
- * Register a service inside a generic factory.
+ * Register a class service
  *
  * @param String name
  * @param Function Service
  * @return Bottle
  */
 var service = function service(name, Service) {
-    var deps = arguments.length > 2 ? slice.call(arguments, 2) : null;
+    return createService.apply(this, [name, Service, true].concat(slice.call(arguments, 2)));
+};
+
+/**
+ * Private helper for creating service and service factories.
+ *
+ * @param String name
+ * @param Function Service
+ * @return Bottle
+ */
+var createService = function createService(name, Service, isClass) {
+    var deps = arguments.length > 3 ? slice.call(arguments, 3) : [];
     var bottle = this;
     return factory.call(this, name, function GenericFactory() {
-        var ServiceCopy = Service;
-        if (deps) {
-            var args = deps.map(getNestedService, bottle.container);
-            args.unshift(Service);
-            ServiceCopy = Service.bind.apply(Service, args);
+        var serviceFactory = Service; // alias for jshint
+        var args = deps.map(getNestedService, bottle.container);
+
+        if (!isClass) {
+            return serviceFactory.apply(null, args);
         }
-        return new ServiceCopy();
+        return new (Service.bind.apply(Service, [null].concat(args)))();
     });
 };
