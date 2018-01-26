@@ -81,6 +81,12 @@ declare class Bottle {
     service<T>(name: string, Constructor: new (...any: any[]) => T, ...dependency: string[]): this;
 
     /**
+     * Register a service function. If Bottle.config.strict is set to true, this method will throw an error if an injected dependency is undefined.
+     */
+    serviceFactory(name: string, factoryService: ((...any: any[]) => any), ...dependency: string[]): this;
+    serviceFactory<T>(name: string, factoryService: ((...any: any[]) => T), ...dependency: string[]): this;
+
+    /**
      * Add an arbitrary value to the container.
      */
     value(name: string, val: any): this;

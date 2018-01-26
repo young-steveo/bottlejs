@@ -41,6 +41,7 @@ Bottle.prototype = {
     register : register,
     resolve : resolve,
     service : service,
+    serviceFactory : serviceFactory,
     value : value
 };
 
