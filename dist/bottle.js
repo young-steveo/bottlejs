@@ -1,12 +1,20 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v1.6.3 - 2017-12-06
+     * BottleJS v1.7.0 - 2018-01-29
      * A powerful dependency injection micro container
      *
-     * Copyright (c) 2017 Stephen Young
+     * Copyright (c) 2018 Stephen Young
      * Licensed MIT
      */
+    /**
+     * String constants
+     */
+    var DELIMITER = '.';
+    var FUNCTION_TYPE = 'function';
+    var STRING_TYPE = 'string';
+    var GLOBAL_NAME = '__global__';
+    var PROVIDER_SUFFIX = 'Provider';
     
     /**
      * Unique id counter;
@@ -66,7 +74,7 @@
      * @return Service
      */
     var getNestedService = function getNestedService(fullname) {
-        return fullname.split('.').reduce(getNested, this);
+        return fullname.split(DELIMITER).reduce(getNested, this);
     };
     
     /**
@@ -77,7 +85,7 @@
      * @return Bottle
      */
     var constant = function constant(name, value) {
-        var parts = name.split('.');
+        var parts = name.split(DELIMITER);
         name = parts.pop();
         defineConstant.call(parts.reduce(setValueObject, this.container), name, value);
         return this;
@@ -101,15 +109,15 @@
      */
     var decorator = function decorator(fullname, func) {
         var parts, name;
-        if (typeof fullname === 'function') {
+        if (typeof fullname === FUNCTION_TYPE) {
             func = fullname;
-            fullname = '__global__';
+            fullname = GLOBAL_NAME;
         }
     
-        parts = fullname.split('.');
+        parts = fullname.split(DELIMITER);
         name = parts.shift();
         if (parts.length) {
-            getNestedBottle.call(this, name).decorator(parts.join('.'), func);
+            getNestedBottle.call(this, name).decorator(parts.join(DELIMITER), func);
         } else {
             if (!this.decorators[name]) {
                 this.decorators[name] = [];
@@ -234,15 +242,15 @@
      */
     var middleware = function middleware(fullname, func) {
         var parts, name;
-        if (typeof fullname === 'function') {
+        if (typeof fullname === FUNCTION_TYPE) {
             func = fullname;
-            fullname = '__global__';
+            fullname = GLOBAL_NAME;
         }
     
-        parts = fullname.split('.');
+        parts = fullname.split(DELIMITER);
         name = parts.shift();
         if (parts.length) {
-            getNestedBottle.call(this, name).middleware(parts.join('.'), func);
+            getNestedBottle.call(this, name).middleware(parts.join(DELIMITER), func);
         } else {
             if (!this.middlewares[name]) {
                 this.middlewares[name] = [];
@@ -270,7 +278,7 @@
      */
     var pop = function pop(name) {
         var instance;
-        if (typeof name === 'string') {
+        if (typeof name === STRING_TYPE) {
             instance = bottles[name];
             if (!instance) {
                 bottles[name] = instance = new Bottle();
@@ -285,7 +293,7 @@
      * Clear all named bottles.
      */
     var clear = function clear(name) {
-        if (typeof name === 'string') {
+        if (typeof name === STRING_TYPE) {
             delete bottles[name];
         } else {
             bottles = {};
@@ -312,8 +320,8 @@
      */
     var provider = function provider(fullname, Provider) {
         var parts, name;
-        parts = fullname.split('.');
-        if (this.providerMap[fullname] && parts.length === 1 && !this.container[fullname + 'Provider']) {
+        parts = fullname.split(DELIMITER);
+        if (this.providerMap[fullname] && parts.length === 1 && !this.container[fullname + PROVIDER_SUFFIX]) {
             return console.error(fullname + ' provider already instantiated.');
         }
         this.originalProviders[fullname] = Provider;
@@ -322,7 +330,7 @@
         name = parts.shift();
     
         if (parts.length) {
-            getNestedBottle.call(this, name).provider(parts.join('.'), Provider);
+            getNestedBottle.call(this, name).provider(parts.join(DELIMITER), Provider);
             return this;
         }
         return createProvider.call(this, name, Provider);
@@ -351,7 +359,7 @@
         container = this.container;
         decorators = this.decorators;
         middlewares = this.middlewares;
-        providerName = name + 'Provider';
+        providerName = name + PROVIDER_SUFFIX;
     
         properties = Object.create(null);
         properties[providerName] = {
@@ -416,7 +424,7 @@
     var removeProviderMap = function resetProvider(name) {
         delete this.providerMap[name];
         delete this.container[name];
-        delete this.container[name + 'Provider'];
+        delete this.container[name + PROVIDER_SUFFIX];
     };
     
     /**
@@ -427,7 +435,7 @@
     var resetProviders = function resetProviders() {
         var providers = this.originalProviders;
         Object.keys(this.originalProviders).forEach(function resetPrvider(provider) {
-            var parts = provider.split('.');
+            var parts = provider.split(DELIMITER);
             if (parts.length > 1) {
                 parts.forEach(removeProviderMap, getNestedBottle.call(this, parts[0]));
             }
@@ -452,23 +460,41 @@
     };
     
     /**
-     * Register a service inside a generic factory.
+     * Register a function service
+     */
+    var serviceFactory = function serviceFactory(name, factoryService) {
+        return createService.apply(this, [name, factoryService, false].concat(slice.call(arguments, 2)));
+    };
+    
+    /**
+     * Register a class service
      *
      * @param String name
      * @param Function Service
      * @return Bottle
      */
     var service = function service(name, Service) {
-        var deps = arguments.length > 2 ? slice.call(arguments, 2) : null;
+        return createService.apply(this, [name, Service, true].concat(slice.call(arguments, 2)));
+    };
+    
+    /**
+     * Private helper for creating service and service factories.
+     *
+     * @param String name
+     * @param Function Service
+     * @return Bottle
+     */
+    var createService = function createService(name, Service, isClass) {
+        var deps = arguments.length > 3 ? slice.call(arguments, 3) : [];
         var bottle = this;
         return factory.call(this, name, function GenericFactory() {
-            var ServiceCopy = Service;
-            if (deps) {
-                var args = deps.map(getNestedService, bottle.container);
-                args.unshift(Service);
-                ServiceCopy = Service.bind.apply(Service, args);
+            var serviceFactory = Service; // alias for jshint
+            var args = deps.map(getNestedService, bottle.container);
+    
+            if (!isClass) {
+                return serviceFactory.apply(null, args);
             }
-            return new ServiceCopy();
+            return new (Service.bind.apply(Service, [null].concat(args)))();
         });
     };
     
@@ -481,7 +507,7 @@
      */
     var value = function value(name, val) {
         var parts;
-        parts = name.split('.');
+        parts = name.split(DELIMITER);
         name = parts.pop();
         defineValue.call(parts.reduce(setValueObject, this.container), name, val);
         return this;
@@ -562,6 +588,7 @@
         register : register,
         resolve : resolve,
         service : service,
+        serviceFactory : serviceFactory,
         value : value
     };
     
@@ -631,7 +658,7 @@
         /**
          * Export
          */
-        if (typeof define === 'function' && typeof define.amd === 'object' && define.amd) {
+        if (typeof define === FUNCTION_TYPE && typeof define.amd === 'object' && define.amd) {
             root.Bottle = Bottle;
             define(function() { return Bottle; });
         } else if (freeExports && freeModule) {

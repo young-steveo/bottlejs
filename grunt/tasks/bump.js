@@ -5,6 +5,14 @@ module.exports = function(grunt) {
             grunt.fatal('Must provide `tag` param.');
             return false;
         }
+
+        /**
+         * Normalizing 'v' part of tag so I don't have to remember the format.
+         */
+        if (tag[0] === 'v') {
+            tag = tag.slice(1);
+        }
+
         ['bower.json', 'package.json'].forEach(function(filename) {
             var data = grunt.file.readJSON(filename);
             data.version = tag;
