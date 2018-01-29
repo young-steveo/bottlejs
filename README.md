@@ -420,22 +420,15 @@ Param                            | Type       | Details
 Used to register a service factory function. Works exactly like `factory` except the factory arguments will be injected instead of receiving the `container`. This is useful when implementing the Module Pattern or adding dependencies to your Higher Order Functions.
 
 ```js
-function createApiActions(axios) {
+function packageKeg(Barrel, Beer, Love) {
+    Barrel.add(Beer, Love);
     return {
-        createUser: function(user) {
-            return axios.post('/users', user);
+        tap : function() {
+            return Barrel.dispense();
         }
     };
 }
-
-var bottle = new Bottle();
-
-bottle.serviceFactory('api', createApiActions, 'axios');
-bottle.factory('axios', function() {
-    return axios.create({baseURL: 'http://api.mydomain'});
-});
-
-bottle.container.api.createUser({name: "BottleJS"});
+bottle.serviceFactory('Keg', packageKeg, 'Barrel', 'Beer', 'Love');
 ```
 
 If `Bottle.config.strict` is set to `true`, this method will throw an error if an injected dependency is `undefined`.
@@ -444,7 +437,7 @@ Param                            | Type       | Details
 :--------------------------------|:-----------|:--------
 **name**                         | *String*   | The name of the service.  Must be unique to each Bottle instance.
 **serviceFactory**               | *Function* | A function that will be invoked to create the service object/value.
-**dependency**<br />*(optional)* | *String*   | An optional name for a dependency to be passed to the service function.  A dependency will be passed to the service function for each name passed to `Bottle#serviceFn` in the order they are listed.
+**dependency**<br />*(optional)* | *String*   | An optional name for a dependency to be passed to the service function.  A dependency will be passed to the service function for each name passed to `Bottle#serviceFactory` in the order they are listed.
 
 #### value(name, val)
 
