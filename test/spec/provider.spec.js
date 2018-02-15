@@ -123,7 +123,7 @@
             expect(b.container.Util.ThingProvider).toBeDefined();
             expect(b.container.Util.Thing).toBeDefined();
         });
-        
+
         it('does not log an error if a service is added to a nested bottle with initialized services', function() {
             var b = new Bottle();
             var Thing = function() {};
@@ -170,6 +170,24 @@
             b.resetProviders();
             expect(b.container.Thing instanceof ThingProvider).toBe(true);
             expect(i).toEqual(2);
+        });
+        it('allows for selectively resetting providers by name', function() {
+          var i = 0;
+          var j = 0;
+          var b = new Bottle();
+          var FirstProvider = function() { i = ++i; this.$get = function() { return this; }; };
+          var SecondProvider = function() { j = ++j; this.$get = function() { return this; }; };
+          b.provider('First', FirstProvider);
+          b.provider('Second', SecondProvider);
+          expect(b.container.First instanceof FirstProvider).toBe(true);
+          expect(b.container.Second instanceof SecondProvider).toBe(true);
+          expect(i).toEqual(1);
+          expect(j).toEqual(1);
+          b.resetProviders(['First']);
+          expect(b.container.First instanceof FirstProvider).toBe(true);
+          expect(b.container.Second instanceof SecondProvider).toBe(true);
+          expect(i).toEqual(2);
+          expect(j).toEqual(1);
         });
         it('allows for sub containers to re-initiate as well', function() {
             var i = 0;
