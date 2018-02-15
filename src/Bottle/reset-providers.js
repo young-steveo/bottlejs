@@ -18,9 +18,10 @@ var removeProviderMap = function resetProvider(name) {
  */
 var resetProviders = function resetProviders(names) {
     var tempProviders = this.originalProviders;
+    var shouldFilter = Array.isArray(names);
 
     Object.keys(this.originalProviders).forEach(function resetProvider(originalProviderName) {
-        if (Array.isArray(names) && names.indexOf(originalProviderName) === -1) {
+        if (shouldFilter && names.indexOf(originalProviderName) === -1) {
             return;
         }
         var parts = originalProviderName.split(DELIMITER);
