@@ -11,18 +11,24 @@ var removeProviderMap = function resetProvider(name) {
 };
 
 /**
- * Resets all providers on a bottle instance.
+ * Resets providers on a bottle instance. If 'names' array is provided, only the named providers will be reset.
  *
+ * @param Array names
  * @return void
  */
-var resetProviders = function resetProviders() {
-    var providers = this.originalProviders;
-    Object.keys(this.originalProviders).forEach(function resetPrvider(provider) {
-        var parts = provider.split(DELIMITER);
+var resetProviders = function resetProviders(names) {
+    var tempProviders = this.originalProviders;
+    var shouldFilter = Array.isArray(names);
+
+    Object.keys(this.originalProviders).forEach(function resetProvider(originalProviderName) {
+        if (shouldFilter && names.indexOf(originalProviderName) === -1) {
+            return;
+        }
+        var parts = originalProviderName.split(DELIMITER);
         if (parts.length > 1) {
             parts.forEach(removeProviderMap, getNestedBottle.call(this, parts[0]));
         }
-        removeProviderMap.call(this, provider);
-        this.provider(provider, providers[provider]);
+        removeProviderMap.call(this, originalProviderName);
+        this.provider(originalProviderName, tempProviders[originalProviderName]);
     }, this);
 };
