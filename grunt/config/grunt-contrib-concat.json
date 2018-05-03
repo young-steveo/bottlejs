@@ -10,6 +10,9 @@
                 "src/globals.js",
                 "src/Bottle/middleware.js",
                 "src/Bottle/provider.js",
+                "src/Bottle/factory.js",
+                "src/Bottle/service.js",
+                "src/Bottle/service-factory.js",
                 "src/Bottle/**.js",
                 "src/api.js",
                 "src/export.js"

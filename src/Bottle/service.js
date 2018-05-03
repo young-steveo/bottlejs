@@ -1,15 +1,4 @@
 /**
- * Register a class service
- *
- * @param String name
- * @param Function Service
- * @return Bottle
- */
-var service = function service(name, Service) {
-    return createService.apply(this, [name, Service, true].concat(slice.call(arguments, 2)));
-};
-
-/**
  * Private helper for creating service and service factories.
  *
  * @param String name
@@ -28,4 +17,15 @@ var createService = function createService(name, Service, isClass) {
         }
         return new (Service.bind.apply(Service, [null].concat(args)))();
     });
+};
+
+/**
+ * Register a class service
+ *
+ * @param String name
+ * @param Function Service
+ * @return Bottle
+ */
+var service = function service(name, Service) {
+    return createService.apply(this, [name, Service, true].concat(slice.call(arguments, 2)));
 };
