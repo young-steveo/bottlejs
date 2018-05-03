@@ -8,6 +8,7 @@
             },
             "src" : [
                 "src/globals.js",
+                "src/Bottle/middleware.js",
                 "src/Bottle/provider.js",
                 "src/Bottle/**.js",
                 "src/api.js",
