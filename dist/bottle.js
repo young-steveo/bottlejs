@@ -1,12 +1,14 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v1.7.0 - 2018-01-29
+     * BottleJS v1.7.1 - 2018-05-03
      * A powerful dependency injection micro container
      *
      * Copyright (c) 2018 Stephen Young
      * Licensed MIT
      */
+    var Bottle;
+    
     /**
      * String constants
      */
@@ -43,7 +45,7 @@
      */
     var getNested = function getNested(obj, prop) {
         var service = obj[prop];
-        if (service === undefined && globalConfig.strict) {
+        if (service === undefined && Bottle.config.strict) {
             throw new Error('Bottle was unable to resolve a service.  `' + prop + '` is undefined.');
         }
         return service;
@@ -75,124 +77,6 @@
      */
     var getNestedService = function getNestedService(fullname) {
         return fullname.split(DELIMITER).reduce(getNested, this);
-    };
-    
-    /**
-     * Register a constant
-     *
-     * @param String name
-     * @param mixed value
-     * @return Bottle
-     */
-    var constant = function constant(name, value) {
-        var parts = name.split(DELIMITER);
-        name = parts.pop();
-        defineConstant.call(parts.reduce(setValueObject, this.container), name, value);
-        return this;
-    };
-    
-    var defineConstant = function defineConstant(name, value) {
-        Object.defineProperty(this, name, {
-            configurable : false,
-            enumerable : true,
-            value : value,
-            writable : false
-        });
-    };
-    
-    /**
-     * Register decorator.
-     *
-     * @param String fullname
-     * @param Function func
-     * @return Bottle
-     */
-    var decorator = function decorator(fullname, func) {
-        var parts, name;
-        if (typeof fullname === FUNCTION_TYPE) {
-            func = fullname;
-            fullname = GLOBAL_NAME;
-        }
-    
-        parts = fullname.split(DELIMITER);
-        name = parts.shift();
-        if (parts.length) {
-            getNestedBottle.call(this, name).decorator(parts.join(DELIMITER), func);
-        } else {
-            if (!this.decorators[name]) {
-                this.decorators[name] = [];
-            }
-            this.decorators[name].push(func);
-        }
-        return this;
-    };
-    
-    /**
-     * Register a function that will be executed when Bottle#resolve is called.
-     *
-     * @param Function func
-     * @return Bottle
-     */
-    var defer = function defer(func) {
-        this.deferred.push(func);
-        return this;
-    };
-    
-    
-    /**
-     * Immediately instantiates the provided list of services and returns them.
-     *
-     * @param Array services
-     * @return Array Array of instances (in the order they were provided)
-     */
-    var digest = function digest(services) {
-        return (services || []).map(getNestedService, this.container);
-    };
-    
-    /**
-     * Register a factory inside a generic provider.
-     *
-     * @param String name
-     * @param Function Factory
-     * @return Bottle
-     */
-    var factory = function factory(name, Factory) {
-        return provider.call(this, name, function GenericProvider() {
-            this.$get = Factory;
-        });
-    };
-    
-    /**
-     * Register an instance factory inside a generic factory.
-     *
-     * @param {String} name - The name of the service
-     * @param {Function} Factory - The factory function, matches the signature required for the
-     * `factory` method
-     * @return Bottle
-     */
-    var instanceFactory = function instanceFactory(name, Factory) {
-        return factory.call(this, name, function GenericInstanceFactory(container) {
-            return {
-                instance : Factory.bind(Factory, container)
-            };
-        });
-    };
-    
-    /**
-     * A filter function for removing bottle container methods and providers from a list of keys
-     */
-    var byMethod = function byMethod(name) {
-        return !/^\$(?:decorator|register|list)$|Provider$/.test(name);
-    };
-    
-    /**
-     * List the services registered on the container.
-     *
-     * @param Object container
-     * @return Array
-     */
-    var list = function list(container) {
-        return Object.keys(container || this.container || {}).filter(byMethod);
     };
     
     /**
@@ -261,46 +145,6 @@
     };
     
     /**
-     * Named bottle instances
-     *
-     * @type Object
-     */
-    var bottles = {};
-    
-    /**
-     * Get an instance of bottle.
-     *
-     * If a name is provided the instance will be stored in a local hash.  Calling Bottle.pop multiple
-     * times with the same name will return the same instance.
-     *
-     * @param String name
-     * @return Bottle
-     */
-    var pop = function pop(name) {
-        var instance;
-        if (typeof name === STRING_TYPE) {
-            instance = bottles[name];
-            if (!instance) {
-                bottles[name] = instance = new Bottle();
-                instance.constant('BOTTLE_NAME', name);
-            }
-            return instance;
-        }
-        return new Bottle();
-    };
-    
-    /**
-     * Clear all named bottles.
-     */
-    var clear = function clear(name) {
-        if (typeof name === STRING_TYPE) {
-            delete bottles[name];
-        } else {
-            bottles = {};
-        }
-    };
-    
-    /**
      * Used to process decorators in the provider
      *
      * @param Object instance
@@ -311,30 +155,6 @@
         return func(instance);
     };
     
-    /**
-     * Register a provider.
-     *
-     * @param String fullname
-     * @param Function Provider
-     * @return Bottle
-     */
-    var provider = function provider(fullname, Provider) {
-        var parts, name;
-        parts = fullname.split(DELIMITER);
-        if (this.providerMap[fullname] && parts.length === 1 && !this.container[fullname + PROVIDER_SUFFIX]) {
-            return console.error(fullname + ' provider already instantiated.');
-        }
-        this.originalProviders[fullname] = Provider;
-        this.providerMap[fullname] = true;
-    
-        name = parts.shift();
-    
-        if (parts.length) {
-            getNestedBottle.call(this, name).provider(parts.join(DELIMITER), Provider);
-            return this;
-        }
-        return createProvider.call(this, name, Provider);
-    };
     
     /**
      * Get decorators and middleware including globals
@@ -344,6 +164,7 @@
     var getWithGlobal = function getWithGlobal(collection, name) {
         return (collection[name] || []).concat(collection.__global__ || []);
     };
+    
     
     /**
      * Create the provider properties on the container
@@ -395,6 +216,284 @@
         return this;
     };
     
+    
+    /**
+     * Register a provider.
+     *
+     * @param String fullname
+     * @param Function Provider
+     * @return Bottle
+     */
+    var provider = function provider(fullname, Provider) {
+        var parts, name;
+        parts = fullname.split(DELIMITER);
+        if (this.providerMap[fullname] && parts.length === 1 && !this.container[fullname + PROVIDER_SUFFIX]) {
+            return console.error(fullname + ' provider already instantiated.');
+        }
+        this.originalProviders[fullname] = Provider;
+        this.providerMap[fullname] = true;
+    
+        name = parts.shift();
+    
+        if (parts.length) {
+            getNestedBottle.call(this, name).provider(parts.join(DELIMITER), Provider);
+            return this;
+        }
+        return createProvider.call(this, name, Provider);
+    };
+    
+    /**
+     * Register a factory inside a generic provider.
+     *
+     * @param String name
+     * @param Function Factory
+     * @return Bottle
+     */
+    var factory = function factory(name, Factory) {
+        return provider.call(this, name, function GenericProvider() {
+            this.$get = Factory;
+        });
+    };
+    
+    /**
+     * Private helper for creating service and service factories.
+     *
+     * @param String name
+     * @param Function Service
+     * @return Bottle
+     */
+    var createService = function createService(name, Service, isClass) {
+        var deps = arguments.length > 3 ? slice.call(arguments, 3) : [];
+        var bottle = this;
+        return factory.call(this, name, function GenericFactory() {
+            var serviceFactory = Service; // alias for jshint
+            var args = deps.map(getNestedService, bottle.container);
+    
+            if (!isClass) {
+                return serviceFactory.apply(null, args);
+            }
+            return new (Service.bind.apply(Service, [null].concat(args)))();
+        });
+    };
+    
+    /**
+     * Register a class service
+     *
+     * @param String name
+     * @param Function Service
+     * @return Bottle
+     */
+    var service = function service(name, Service) {
+        return createService.apply(this, [name, Service, true].concat(slice.call(arguments, 2)));
+    };
+    
+    /**
+     * Register a function service
+     */
+    var serviceFactory = function serviceFactory(name, factoryService) {
+        return createService.apply(this, [name, factoryService, false].concat(slice.call(arguments, 2)));
+    };
+    
+    /**
+     * Define a mutable property on the container.
+     *
+     * @param String name
+     * @param mixed val
+     * @return void
+     * @scope container
+     */
+    var defineValue = function defineValue(name, val) {
+        Object.defineProperty(this, name, {
+            configurable : true,
+            enumerable : true,
+            value : val,
+            writable : true
+        });
+    };
+    
+    /**
+     * Iterator for setting a plain object literal via defineValue
+     *
+     * @param Object container
+     * @param string name
+     */
+    var setValueObject = function setValueObject(container, name) {
+        var nestedContainer = container[name];
+        if (!nestedContainer) {
+            nestedContainer = {};
+            defineValue.call(container, name, nestedContainer);
+        }
+        return nestedContainer;
+    };
+    
+    
+    /**
+     * Register a value
+     *
+     * @param String name
+     * @param mixed val
+     * @return Bottle
+     */
+    var value = function value(name, val) {
+        var parts;
+        parts = name.split(DELIMITER);
+        name = parts.pop();
+        defineValue.call(parts.reduce(setValueObject, this.container), name, val);
+        return this;
+    };
+    
+    /**
+     * Define an enumerable, non-configurable, non-writable value.
+     *
+     * @param String name
+     * @param mixed value
+     * @return undefined
+     */
+    var defineConstant = function defineConstant(name, value) {
+        Object.defineProperty(this, name, {
+            configurable : false,
+            enumerable : true,
+            value : value,
+            writable : false
+        });
+    };
+    
+    /**
+     * Register a constant
+     *
+     * @param String name
+     * @param mixed value
+     * @return Bottle
+     */
+    var constant = function constant(name, value) {
+        var parts = name.split(DELIMITER);
+        name = parts.pop();
+        defineConstant.call(parts.reduce(setValueObject, this.container), name, value);
+        return this;
+    };
+    
+    /**
+     * Register decorator.
+     *
+     * @param String fullname
+     * @param Function func
+     * @return Bottle
+     */
+    var decorator = function decorator(fullname, func) {
+        var parts, name;
+        if (typeof fullname === FUNCTION_TYPE) {
+            func = fullname;
+            fullname = GLOBAL_NAME;
+        }
+    
+        parts = fullname.split(DELIMITER);
+        name = parts.shift();
+        if (parts.length) {
+            getNestedBottle.call(this, name).decorator(parts.join(DELIMITER), func);
+        } else {
+            if (!this.decorators[name]) {
+                this.decorators[name] = [];
+            }
+            this.decorators[name].push(func);
+        }
+        return this;
+    };
+    
+    /**
+     * Register a function that will be executed when Bottle#resolve is called.
+     *
+     * @param Function func
+     * @return Bottle
+     */
+    var defer = function defer(func) {
+        this.deferred.push(func);
+        return this;
+    };
+    
+    
+    /**
+     * Immediately instantiates the provided list of services and returns them.
+     *
+     * @param Array services
+     * @return Array Array of instances (in the order they were provided)
+     */
+    var digest = function digest(services) {
+        return (services || []).map(getNestedService, this.container);
+    };
+    
+    /**
+     * Register an instance factory inside a generic factory.
+     *
+     * @param {String} name - The name of the service
+     * @param {Function} Factory - The factory function, matches the signature required for the
+     * `factory` method
+     * @return Bottle
+     */
+    var instanceFactory = function instanceFactory(name, Factory) {
+        return factory.call(this, name, function GenericInstanceFactory(container) {
+            return {
+                instance : Factory.bind(Factory, container)
+            };
+        });
+    };
+    
+    /**
+     * A filter function for removing bottle container methods and providers from a list of keys
+     */
+    var byMethod = function byMethod(name) {
+        return !/^\$(?:decorator|register|list)$|Provider$/.test(name);
+    };
+    
+    /**
+     * List the services registered on the container.
+     *
+     * @param Object container
+     * @return Array
+     */
+    var list = function list(container) {
+        return Object.keys(container || this.container || {}).filter(byMethod);
+    };
+    
+    /**
+     * Named bottle instances
+     *
+     * @type Object
+     */
+    var bottles = {};
+    
+    /**
+     * Get an instance of bottle.
+     *
+     * If a name is provided the instance will be stored in a local hash.  Calling Bottle.pop multiple
+     * times with the same name will return the same instance.
+     *
+     * @param String name
+     * @return Bottle
+     */
+    var pop = function pop(name) {
+        var instance;
+        if (typeof name === STRING_TYPE) {
+            instance = bottles[name];
+            if (!instance) {
+                bottles[name] = instance = new Bottle();
+                instance.constant('BOTTLE_NAME', name);
+            }
+            return instance;
+        }
+        return new Bottle();
+    };
+    
+    /**
+     * Clear all named bottles.
+     */
+    var clear = function clear(name) {
+        if (typeof name === STRING_TYPE) {
+            delete bottles[name];
+        } else {
+            bottles = {};
+        }
+    };
+    
     /**
      * Register a service, factory, provider, or value based on properties on the object.
      *
@@ -428,19 +527,25 @@
     };
     
     /**
-     * Resets all providers on a bottle instance.
+     * Resets providers on a bottle instance. If 'names' array is provided, only the named providers will be reset.
      *
+     * @param Array names
      * @return void
      */
-    var resetProviders = function resetProviders() {
-        var providers = this.originalProviders;
-        Object.keys(this.originalProviders).forEach(function resetPrvider(provider) {
-            var parts = provider.split(DELIMITER);
+    var resetProviders = function resetProviders(names) {
+        var tempProviders = this.originalProviders;
+        var shouldFilter = Array.isArray(names);
+    
+        Object.keys(this.originalProviders).forEach(function resetProvider(originalProviderName) {
+            if (shouldFilter && names.indexOf(originalProviderName) === -1) {
+                return;
+            }
+            var parts = originalProviderName.split(DELIMITER);
             if (parts.length > 1) {
                 parts.forEach(removeProviderMap, getNestedBottle.call(this, parts[0]));
             }
-            removeProviderMap.call(this, provider);
-            this.provider(provider, providers[provider]);
+            removeProviderMap.call(this, originalProviderName);
+            this.provider(originalProviderName, tempProviders[originalProviderName]);
         }, this);
     };
     
@@ -459,99 +564,13 @@
         return this;
     };
     
-    /**
-     * Register a function service
-     */
-    var serviceFactory = function serviceFactory(name, factoryService) {
-        return createService.apply(this, [name, factoryService, false].concat(slice.call(arguments, 2)));
-    };
-    
-    /**
-     * Register a class service
-     *
-     * @param String name
-     * @param Function Service
-     * @return Bottle
-     */
-    var service = function service(name, Service) {
-        return createService.apply(this, [name, Service, true].concat(slice.call(arguments, 2)));
-    };
-    
-    /**
-     * Private helper for creating service and service factories.
-     *
-     * @param String name
-     * @param Function Service
-     * @return Bottle
-     */
-    var createService = function createService(name, Service, isClass) {
-        var deps = arguments.length > 3 ? slice.call(arguments, 3) : [];
-        var bottle = this;
-        return factory.call(this, name, function GenericFactory() {
-            var serviceFactory = Service; // alias for jshint
-            var args = deps.map(getNestedService, bottle.container);
-    
-            if (!isClass) {
-                return serviceFactory.apply(null, args);
-            }
-            return new (Service.bind.apply(Service, [null].concat(args)))();
-        });
-    };
-    
-    /**
-     * Register a value
-     *
-     * @param String name
-     * @param mixed val
-     * @return Bottle
-     */
-    var value = function value(name, val) {
-        var parts;
-        parts = name.split(DELIMITER);
-        name = parts.pop();
-        defineValue.call(parts.reduce(setValueObject, this.container), name, val);
-        return this;
-    };
-    
-    /**
-     * Iterator for setting a plain object literal via defineValue
-     *
-     * @param Object container
-     * @param string name
-     */
-    var setValueObject = function setValueObject(container, name) {
-        var nestedContainer = container[name];
-        if (!nestedContainer) {
-            nestedContainer = {};
-            defineValue.call(container, name, nestedContainer);
-        }
-        return nestedContainer;
-    };
-    
-    /**
-     * Define a mutable property on the container.
-     *
-     * @param String name
-     * @param mixed val
-     * @return void
-     * @scope container
-     */
-    var defineValue = function defineValue(name, val) {
-        Object.defineProperty(this, name, {
-            configurable : true,
-            enumerable : true,
-            value : val,
-            writable : true
-        });
-    };
-    
     
     /**
      * Bottle constructor
      *
      * @param String name Optional name for functional construction
      */
-    var Bottle = function Bottle(name) {
+    Bottle = function Bottle(name) {
         if (!(this instanceof Bottle)) {
             return Bottle.pop(name);
         }
@@ -602,7 +621,7 @@
     /**
      * Global config
      */
-    var globalConfig = Bottle.config = {
+    Bottle.config = {
         strict : false
     };
     
