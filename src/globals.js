@@ -1,3 +1,5 @@
+var Bottle;
+
 /**
  * String constants
  */
@@ -34,7 +36,7 @@ var slice = Array.prototype.slice;
  */
 var getNested = function getNested(obj, prop) {
     var service = obj[prop];
-    if (service === undefined && globalConfig.strict) {
+    if (service === undefined && Bottle.config.strict) {
         throw new Error('Bottle was unable to resolve a service.  `' + prop + '` is undefined.');
     }
     return service;

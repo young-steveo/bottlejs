@@ -4,7 +4,7 @@
  *
  * @param String name Optional name for functional construction
  */
-var Bottle = function Bottle(name) {
+Bottle = function Bottle(name) {
     if (!(this instanceof Bottle)) {
         return Bottle.pop(name);
     }
@@ -55,6 +55,6 @@ Bottle.list = list;
 /**
  * Global config
  */
-var globalConfig = Bottle.config = {
+Bottle.config = {
     strict : false
 };
