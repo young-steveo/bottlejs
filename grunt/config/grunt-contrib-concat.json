@@ -13,6 +13,8 @@
                 "src/Bottle/factory.js",
                 "src/Bottle/service.js",
                 "src/Bottle/service-factory.js",
+                "src/Bottle/value.js",
+                "src/Bottle/constant.js",
                 "src/Bottle/**.js",
                 "src/api.js",
                 "src/export.js"
