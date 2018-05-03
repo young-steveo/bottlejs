@@ -1,16 +1,18 @@
 /**
- * Register a value
+ * Define a mutable property on the container.
  *
  * @param String name
  * @param mixed val
- * @return Bottle
+ * @return void
+ * @scope container
  */
-var value = function value(name, val) {
-    var parts;
-    parts = name.split(DELIMITER);
-    name = parts.pop();
-    defineValue.call(parts.reduce(setValueObject, this.container), name, val);
-    return this;
+var defineValue = function defineValue(name, val) {
+    Object.defineProperty(this, name, {
+        configurable : true,
+        enumerable : true,
+        value : val,
+        writable : true
+    });
 };
 
 /**
@@ -28,19 +30,18 @@ var setValueObject = function setValueObject(container, name) {
     return nestedContainer;
 };
 
+
 /**
- * Define a mutable property on the container.
+ * Register a value
  *
  * @param String name
  * @param mixed val
- * @return void
- * @scope container
+ * @return Bottle
  */
-var defineValue = function defineValue(name, val) {
-    Object.defineProperty(this, name, {
-        configurable : true,
-        enumerable : true,
-        value : val,
-        writable : true
-    });
+var value = function value(name, val) {
+    var parts;
+    parts = name.split(DELIMITER);
+    name = parts.pop();
+    defineValue.call(parts.reduce(setValueObject, this.container), name, val);
+    return this;
 };

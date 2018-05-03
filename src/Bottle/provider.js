@@ -9,30 +9,6 @@ var reducer = function reducer(instance, func) {
     return func(instance);
 };
 
-/**
- * Register a provider.
- *
- * @param String fullname
- * @param Function Provider
- * @return Bottle
- */
-var provider = function provider(fullname, Provider) {
-    var parts, name;
-    parts = fullname.split(DELIMITER);
-    if (this.providerMap[fullname] && parts.length === 1 && !this.container[fullname + PROVIDER_SUFFIX]) {
-        return console.error(fullname + ' provider already instantiated.');
-    }
-    this.originalProviders[fullname] = Provider;
-    this.providerMap[fullname] = true;
-
-    name = parts.shift();
-
-    if (parts.length) {
-        getNestedBottle.call(this, name).provider(parts.join(DELIMITER), Provider);
-        return this;
-    }
-    return createProvider.call(this, name, Provider);
-};
 
 /**
  * Get decorators and middleware including globals
@@ -42,6 +18,7 @@ var provider = function provider(fullname, Provider) {
 var getWithGlobal = function getWithGlobal(collection, name) {
     return (collection[name] || []).concat(collection.__global__ || []);
 };
+
 
 /**
  * Create the provider properties on the container
@@ -91,4 +68,30 @@ var createProvider = function createProvider(name, Provider) {
 
     Object.defineProperties(container, properties);
     return this;
+};
+
+
+/**
+ * Register a provider.
+ *
+ * @param String fullname
+ * @param Function Provider
+ * @return Bottle
+ */
+var provider = function provider(fullname, Provider) {
+    var parts, name;
+    parts = fullname.split(DELIMITER);
+    if (this.providerMap[fullname] && parts.length === 1 && !this.container[fullname + PROVIDER_SUFFIX]) {
+        return console.error(fullname + ' provider already instantiated.');
+    }
+    this.originalProviders[fullname] = Provider;
+    this.providerMap[fullname] = true;
+
+    name = parts.shift();
+
+    if (parts.length) {
+        getNestedBottle.call(this, name).provider(parts.join(DELIMITER), Provider);
+        return this;
+    }
+    return createProvider.call(this, name, Provider);
 };

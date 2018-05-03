@@ -1,4 +1,20 @@
 /**
+ * Define an enumerable, non-configurable, non-writable value.
+ *
+ * @param String name
+ * @param mixed value
+ * @return undefined
+ */
+var defineConstant = function defineConstant(name, value) {
+    Object.defineProperty(this, name, {
+        configurable : false,
+        enumerable : true,
+        value : value,
+        writable : false
+    });
+};
+
+/**
  * Register a constant
  *
  * @param String name
@@ -10,13 +26,4 @@ var constant = function constant(name, value) {
     name = parts.pop();
     defineConstant.call(parts.reduce(setValueObject, this.container), name, value);
     return this;
-};
-
-var defineConstant = function defineConstant(name, value) {
-    Object.defineProperty(this, name, {
-        configurable : false,
-        enumerable : true,
-        value : value,
-        writable : false
-    });
 };
