@@ -1,7 +1,7 @@
-declare class Bottle {
-    static pop: (name?: string) => Bottle;
-    static clear: (name?: string) => void;
-    static list: (container?: Bottle.IContainer) => Array<string>;
+declare class Bottle<EntryName extends string = string> {
+    static pop(name?: string): Bottle;
+    static clear(name?: string): void;
+    static list<T extends string = string>(container?: Bottle.IContainer<T>): Array<T>;
     static config: Object;
 
     public container: Bottle.IContainer;
@@ -21,7 +21,8 @@ declare class Bottle {
     /**
      * Register a decorator function that the provider will use to modify your services at creation time.
      */
-    decorator(name: string|((service: any) => any), func?: (service: any) => any): this;
+    decorator(func: Bottle.Decorator): this;
+    decorator(name: EntryName, func: Bottle.Decorator): this;
 
     /**
      * Register a function to be executed when Bottle#resolve is called.
@@ -31,33 +32,33 @@ declare class Bottle {
     /**
      * Immediately instantiate an array of services and return their instances in the order of the array of instances.
      */
-    digest(services: Array<string>): Array<any>;
+    digest(services: EntryName[]): Array<any>;
 
     /**
      * Register a service factory
      */
-    factory(name: string, Factory: (container: Bottle.IContainer) => any): this;
+    factory(name: EntryName, Factory: (container: Bottle.IContainer<EntryName>) => any): this;
 
     /**
      * Register a service instance factory
      */
-    instanceFactory(name: string, Factory: (container: Bottle.IContainer) => any): this;
+    instanceFactory(name: EntryName, Factory: (container: Bottle.IContainer<EntryName>) => any): this;
 
     /**
      * List the services registered on the container
      */
-    list(container?: Bottle.IContainer): Array<string>;
+    list<T extends string = EntryName>(container?: Bottle.IContainer<T>): Array<T>;
 
     /**
      * Register a middleware function. This function will be executed every time the service is accessed.
      */
-    middleware(name: string|((service: any, next: (error?: Error) => void) => void),
-        func?: (service: any, next: (error?: Error) => void) => void): this;
+    middleware(func: Bottle.Middleware): this;
+    middleware(name: EntryName, func: Bottle.Middleware): this;
 
     /**
      * Register a service provider
      */
-    provider(name: string, Provider: ((...any: any[]) => void)): this;
+    provider(name: EntryName, Provider: ((...any: any[]) => void)): this;
 
     /**
      * Reset providers on the bottle instance.
@@ -77,24 +78,27 @@ declare class Bottle {
     /**
      * Register a service constructor. If Bottle.config.strict is set to true, this method will throw an error if an injected dependency is undefined.
      */
-    service(name: string, Constructor: ((...any: any[]) => any), ...dependency: string[]): this;
-    service<T>(name: string, Constructor: new (...any: any[]) => T, ...dependency: string[]): this;
+    service(name: EntryName, Constructor: ((...any: any[]) => any), ...dependency: EntryName[]): this;
+    service<T>(name: EntryName, Constructor: new (...any: any[]) => T, ...dependency: EntryName[]): this;
 
     /**
      * Register a service function. If Bottle.config.strict is set to true, this method will throw an error if an injected dependency is undefined.
      */
-    serviceFactory(name: string, factoryService: ((...any: any[]) => any), ...dependency: string[]): this;
-    serviceFactory<T>(name: string, factoryService: ((...any: any[]) => T), ...dependency: string[]): this;
+    serviceFactory(name: EntryName, factoryService: ((...any: any[]) => any), ...dependency: EntryName[]): this;
+    serviceFactory<T>(name: EntryName, factoryService: ((...any: any[]) => T), ...dependency: EntryName[]): this;
 
     /**
      * Add an arbitrary value to the container.
      */
-    value(name: string, val: any): this;
+    value(name: EntryName, val: any): this;
 }
 
 export = Bottle;
 
 declare module Bottle {
+    type Middleware = ((service: any, next: (error?: Error) => void) => void);
+    type Decorator = (service: any) => any;
+
     interface IRegisterableObject {
         $name: string;
         $type?: string;
@@ -103,10 +107,10 @@ declare module Bottle {
         [others: string]: any;
     }
 
-    interface IContainer {
+    interface IContainer<EntryName extends string = string> {
         [key: string]: any;
-        $decorator(name: string|((service: any) => any), func?: (service: any) => any): this;
+        $decorator(name: string | Decorator, func?: Decorator): this;
         $register(Obj: Bottle.IRegisterableObject): this;
-        $list(container?: Bottle.IContainer): Array<string>;
+        $list(container?: Bottle.IContainer): EntryName[];
     }
 }
