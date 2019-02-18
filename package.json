@@ -27,7 +27,7 @@
   "homepage": "https://github.com/young-steveo/bottlejs",
   "devDependencies": {
     "grunt": "^1.0.3",
-    "grunt-contrib-clean": "^1.1.0",
+    "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-jasmine": "^2.0.3",
     "grunt-contrib-jshint": "^1.1.0",
