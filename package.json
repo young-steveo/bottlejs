@@ -3,6 +3,7 @@
   "version": "1.7.2",
   "description": "A powerful dependency injection micro container",
   "main": "dist/bottle.js",
+  "module": "dist/bottle-es.js",
   "typings": "dist/bottle.d.ts",
   "scripts": {
     "test": "grunt test"
