@@ -1,25 +1,39 @@
 {
-    "concat" : {
-        "dist" : {
-            "options" : {
-                "stripBanners" : false,
-                "separator" : "\n",
-                "banner" : "/**\n * BottleJS v<%= pkg.version %> - <%= grunt.template.today('yyyy-mm-dd') %>\n * <%= pkg.description %>\n *\n * Copyright (c) <%= grunt.template.today('yyyy') %> Stephen Young\n * Licensed <%= pkg.license %>\n */\n"
+    "concat": {
+        "dist": {
+            "options": {
+                "stripBanners": false,
+                "separator": "\n",
+                "banner": "/**\n * BottleJS v<%= pkg.version %> - <%= grunt.template.today('yyyy-mm-dd') %>\n * <%= pkg.description %>\n *\n * Copyright (c) <%= grunt.template.today('yyyy') %> Stephen Young\n * Licensed <%= pkg.license %>\n */\n"
             },
-            "src" : [
-                "src/globals.js",
-                "src/Bottle/middleware.js",
-                "src/Bottle/provider.js",
-                "src/Bottle/factory.js",
-                "src/Bottle/service.js",
-                "src/Bottle/service-factory.js",
-                "src/Bottle/value.js",
-                "src/Bottle/constant.js",
-                "src/Bottle/**.js",
-                "src/api.js",
-                "src/export.js"
-            ],
-            "dest" : "dist/bottle.js"
+            "files": {
+                "dist/bottle.js": [
+                    "src/globals.js",
+                    "src/Bottle/middleware.js",
+                    "src/Bottle/provider.js",
+                    "src/Bottle/factory.js",
+                    "src/Bottle/service.js",
+                    "src/Bottle/service-factory.js",
+                    "src/Bottle/value.js",
+                    "src/Bottle/constant.js",
+                    "src/Bottle/**.js",
+                    "src/api.js",
+                    "src/export.js"
+                ],
+                "dist/bottle-es.js": [
+                    "src/globals.js",
+                    "src/Bottle/middleware.js",
+                    "src/Bottle/provider.js",
+                    "src/Bottle/factory.js",
+                    "src/Bottle/service.js",
+                    "src/Bottle/service-factory.js",
+                    "src/Bottle/value.js",
+                    "src/Bottle/constant.js",
+                    "src/Bottle/**.js",
+                    "src/api.js",
+                    "src/export-es.js"
+                ]
+            }
         }
     }
 }
