@@ -32,7 +32,7 @@
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-jasmine": "^2.0.3",
     "grunt-contrib-jshint": "^2.0.0",
-    "grunt-contrib-uglify": "^4.0.0",
+    "grunt-contrib-uglify": "^5.0.0",
     "grunt-wrap": "^0.3.1",
     "lodash": "^4.17.0"
   }
