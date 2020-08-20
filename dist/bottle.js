@@ -1,10 +1,10 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v1.7.2 - 2019-02-07
+     * BottleJS v2.0.0 - 2020-08-20
      * A powerful dependency injection micro container
      *
-     * Copyright (c) 2019 Stephen Young
+     * Copyright (c) 2020 Stephen Young
      * Licensed MIT
      */
     var Bottle;
