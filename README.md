@@ -235,7 +235,7 @@ bottle.factory('Beer.IPA', function(container) {
 
 #### pop(name)
 
-Used to get an instance of bottle.  If a name is passed, bottle will return the same instance.  Calling the Bottle constructor as a function will call and return return `Bottle.pop`, so `Bottle.pop('Soda') === Bottle('Soda')`
+Used to get an instance of bottle.  If a name is passed, bottle will return the same instance.  Calling the Bottle constructor as a function will call and return `Bottle.pop`, so `Bottle.pop('Soda') === Bottle('Soda')`
 
 Param                      | Type       | Details
 :--------------------------|:-----------|:--------
