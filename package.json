@@ -30,7 +30,7 @@
     "grunt": "^1.0.3",
     "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-concat": "^1.0.1",
-    "grunt-contrib-jasmine": "^2.0.3",
+    "grunt-contrib-jasmine": "^3.0.0",
     "grunt-contrib-jshint": "^3.0.0",
     "grunt-contrib-uglify": "^5.0.0",
     "grunt-wrap": "^0.3.1",
