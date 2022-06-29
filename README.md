@@ -40,7 +40,7 @@ $ npm install bottlejs
 BottleJS is also available on cdnjs:
 
 ```html
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bottlejs/1.7.1/bottle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bottlejs/2.0.1/bottle.min.js"></script>
 ```
 
 ## Simple Example
