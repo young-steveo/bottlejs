@@ -4,7 +4,9 @@
   "description": "A powerful dependency injection micro container",
   "main": "dist/bottle.js",
   "module": "dist/bottle-es.js",
-  "files": [ "dist/**/*" ],
+  "files": [
+    "dist/**/*"
+  ],
   "type": "module",
   "typings": "dist/bottle.d.ts",
   "scripts": {
@@ -29,7 +31,10 @@
   },
   "homepage": "https://github.com/young-steveo/bottlejs",
   "devDependencies": {
+    "@types/jest": "^28.1.3",
+    "jest": "^28.1.2",
     "prettier": "^2.7.1",
+    "ts-jest": "^28.0.5",
     "tslint": "^6.1.3",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^4.7.4"
