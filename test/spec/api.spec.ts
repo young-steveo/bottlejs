@@ -9,15 +9,8 @@ describe("Bottle API", function() {
             expect(new Bottle() instanceof Bottle).toBe(true);
         });
 
-        it("creates a new instance if called like a function", function() {
-            /* jshint newcap: false */
-            expect(Bottle() instanceof Bottle).toBe(true);
-            /* jshint newcap: true */
-        });
         it("creates the same instance if called like a function with a name", function() {
-            /* jshint newcap: false */
-            expect(Bottle("Fizz")).toBe(Bottle("Fizz"));
-            /* jshint newcap: true */
+            expect(new Bottle("Fizz")).toBe(Bottle("Fizz"));
         });
     });
     describe("prototype", function() {
