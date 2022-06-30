@@ -1,5 +1,7 @@
 bottle-logo.jpg
-bower.json
 dist/*.min.*
 src/
 test/
+tsconfig.json
+tslint.json
+.prettierrc
