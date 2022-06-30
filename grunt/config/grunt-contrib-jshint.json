@@ -1,9 +1,0 @@
-{
-    "jshint" : {
-        "options" : {
-            "jshintrc" : ".jshintrc",
-            "reporterOutput": ""
-        },
-        "source" : ["./gruntfile.js", "test/**/*.js", "dist/bottle.js"]
-    }
-}
