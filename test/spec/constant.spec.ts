@@ -37,6 +37,8 @@ describe('Bottle#constant', function() {
         var b = new Bottle();
         b.constant('nested.thing', '123');
 
+        expect(b.container.nested).toBeDefined();
+        expect(b.container.nested.thing).toBe('123');
         expect(b.container.nested.thing).toBe('123');
         expect(() => b.container.nested.thing = 'xyz').toThrow(TypeError)
         expect(b.container.nested.thing).toBe('123');

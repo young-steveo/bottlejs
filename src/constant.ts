@@ -1,6 +1,6 @@
 import Container from './container.js'
 
-export const defineConstant = <Type>(container: Container, name: string, value: Type): void => {
+export const defineConstant = <Constant>(container: Container, name: string, value: Constant): void => {
     Object.defineProperty(container, name, {
         configurable: false,
         enumerable: true,
