@@ -4,6 +4,16 @@ import Bottle from '../../src/bottle'
  * Bottle Value test suite
  */
 describe('Bottle#value', function() {
+    it('creates a property on the container', function() {
+        var bottle = new Bottle();
+        var container = bottle.container;
+
+        expect(container.mutable).not.toBeDefined();
+
+        bottle.value('mutable', 'abc');
+        expect(container.mutable).toBe('abc');
+    });
+
     it('creates a mutable property on the container', function() {
         var bottle = new Bottle();
         var container = bottle.container;
@@ -15,6 +25,16 @@ describe('Bottle#value', function() {
 
         container.mutable = 'xyz';
         expect(container.mutable).toBe('xyz');
+    });
+
+    it('creates a property on the container that can be deleted', function() {
+        var bottle = new Bottle();
+        var container = bottle.container;
+
+        expect(container.mutable).not.toBeDefined();
+
+        bottle.value('mutable', 'abc');
+        expect(container.mutable).toBe('abc');
 
         delete container.mutable;
         expect(container.mutable).not.toBeDefined();
