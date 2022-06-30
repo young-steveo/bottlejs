@@ -1,7 +1,7 @@
 import { defineConstant } from './constant.js'
 import Container, { DELIMITER, newContainer, resolveNestedContainer, split } from './container.js'
 import Provider, { defineProvider, PROVIDER_SUFFIX } from './provider.js'
-import factoryProvider from './factory.js';
+import Factory, { factoryProvider, instanceFactory } from './factory.js';
 import { defineValue } from './value.js'
 
 const bottles: Record<string, Bottle> = {}
@@ -125,7 +125,11 @@ export default class Bottle {
         })
     }
 
-    public factory<Service>(name: string, factory: () => Service): Bottle {
+    public factory<Service>(name: string, factory: Factory<Service>): Bottle {
         return this.provider(name, factoryProvider(factory))
+    }
+
+    public instanceFactory<Service>(name: string, factory: Factory<Service>): Bottle {
+        return this.factory(name, instanceFactory(factory))
     }
 }

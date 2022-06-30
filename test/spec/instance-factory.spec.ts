@@ -5,26 +5,24 @@ import Bottle from '../../src/bottle'
  */
 describe('Bottle#instanceFactory', function() {
     describe('when the same key is used twice', function() {
+        let b = new Bottle();
         beforeEach(function() {
-            this.b = new Bottle();
-            spyOn(console, 'error');
-            this.b.instanceFactory('same.name', function() {
+            b = new Bottle();
+            b.instanceFactory('same.name', function() {
                 return {};
             });
         });
         describe('when the service has not yet been instantiated', function() {
             it('doesn\'t log an error', function() {
-                this.b.instanceFactory('same.name', function() { });
-                expect(console.error).not.toHaveBeenCalled();
+                expect(() => b.instanceFactory('same.name', function() { })).not.toThrowError();
             });
         });
         describe('when the service has already been instantiated', function() {
             beforeEach(function() {
-                this.b.container.same.name.instance();
+                b.container.same.name.instance();
             });
             it('logs an error', function(){
-                this.b.instanceFactory('same.name', function(){ });
-                expect(console.error).toHaveBeenCalled();
+                expect(() => b.instanceFactory('same.name', function() { })).toThrowError();
             });
         });
     });
@@ -36,7 +34,7 @@ describe('Bottle#instanceFactory', function() {
     });
     it('creates an instance factory that gets passesed a container when it is requested', function() {
         var b = new Bottle();
-        var spy = jasmine.createSpy('ThingFactory').and.returnValue(true);
+        var spy = jest.fn(() => true);
         b.instanceFactory('Thing', spy);
         expect(b.container.Thing).toBeDefined();
         expect(spy).not.toHaveBeenCalled();
@@ -49,7 +47,7 @@ describe('Bottle#instanceFactory', function() {
     it('will create new instances when instance is called', function() {
         var b = new Bottle();
         var i = 0;
-        var Thing = function() { i++; };
+        var Thing = class { constructor() {i++; } };
         var ThingFactory = function() { return new Thing(); };
         b.instanceFactory('Thing', ThingFactory);
         expect(b.container.Thing.instance()).toBeDefined();
