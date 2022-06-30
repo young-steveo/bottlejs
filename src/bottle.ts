@@ -1,6 +1,7 @@
 import { defineConstant } from './constant.js'
 import Container, { DELIMITER, newContainer, resolveNestedContainer, split } from './container.js'
 import Provider, { defineProvider, PROVIDER_SUFFIX } from './provider.js'
+import factoryProvider from './factory.js';
 import { defineValue } from './value.js'
 
 const bottles: Record<string, Bottle> = {}
@@ -90,7 +91,7 @@ export default class Bottle {
      * @param Function Provider
      * @return Bottle
      */
-    public provider<Service>(fullName: string, provider: new () => Provider<Service>) {
+    public provider<Service>(fullName: string, provider: new () => Provider<Service>): Bottle {
         const parts = fullName.split(DELIMITER)
         let container = this.container
         if (parts.length) {
@@ -105,7 +106,8 @@ export default class Bottle {
         }
         this.providers[fullName] = provider
 
-        return defineProvider(container, name, provider)
+        defineProvider(container, name, provider)
+        return this
     }
 
     public resetProviders(names: string[] = []) {
@@ -121,5 +123,9 @@ export default class Bottle {
             delete container[name + PROVIDER_SUFFIX]
             this.provider(providerName, provider)
         })
+    }
+
+    public factory<Service>(name: string, factory: () => Service): Bottle {
+        return this.provider(name, factoryProvider(factory))
     }
 }
