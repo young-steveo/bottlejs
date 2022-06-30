@@ -52,4 +52,14 @@ export default class Bottle {
       }
     }
   }
+
+  public constant<Type>(name: string, value: Type): Bottle {
+    Object.defineProperty(this.container, name, {
+        configurable : false,
+        enumerable : true,
+        writable : false,
+        value
+    });
+    return this
+  }
 }
