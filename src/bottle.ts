@@ -1,5 +1,6 @@
 import { defineConstant } from './constant.js'
 import Container, { newContainer } from './container.js'
+import { setValueContainer } from './value.js';
 
 const bottles: Record<string, Bottle> = {}
 let id = 0
@@ -55,7 +56,9 @@ export default class Bottle {
     }
 
     public constant<Type>(name: string, value: Type): Bottle {
-        defineConstant(this.container, name, value)
+        const parts = name.split('.')
+        name = parts.pop() || name
+        defineConstant(parts.reduce(setValueContainer, this.container), name, value)
         return this
     }
 }

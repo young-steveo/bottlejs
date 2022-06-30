@@ -33,24 +33,24 @@ describe('Bottle#constant', function() {
         expect(container.permanent).toBe('abc');
     });
 
-    // it('will nest bottle containers if the name uses dot notation', function() {
-    //     var b = new Bottle();
-    //     b.constant('nested.thing', '123');
+    it('will nest bottle containers if the name uses dot notation', function() {
+        var b = new Bottle();
+        b.constant('nested.thing', '123');
 
-    //     expect(b.container.nested.thing).toBe('123');
+        expect(b.container.nested.thing).toBe('123');
 
-    //     try {
-    //         b.container.nested.thing = 'xyz';
-    //     } catch (e) {
-    //         // TypeError: Attempted to assign to readonly property.
-    //     }
-    //     expect(b.container.nested.thing).toBe('123');
+        try {
+            b.container.nested.thing = 'xyz';
+        } catch (e) {
+            // TypeError: Attempted to assign to readonly property.
+        }
+        expect(b.container.nested.thing).toBe('123');
 
-    //     try {
-    //         delete b.container.nested.thing;
-    //     } catch (e) {
-    //         // TypeError: Unable to delete property.
-    //     }
-    //     expect(b.container.nested.thing).toBe('123');
-    // });
+        try {
+            delete b.container.nested.thing;
+        } catch (e) {
+            // TypeError: Unable to delete property.
+        }
+        expect(b.container.nested.thing).toBe('123');
+    });
 });
