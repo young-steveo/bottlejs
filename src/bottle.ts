@@ -1,4 +1,4 @@
-import Container from './container.js'
+import Container, { newContainer } from './container.js'
 
 const bottles: Record<string, Bottle> = {}
 let id = 0
@@ -7,19 +7,25 @@ export default class Bottle {
   private id: number
   public container: Container
 
+  /**
+   * Bottle constructor
+   *
+   * @param string name Optional name for the bottle instance
+   */
   public constructor(name?: string) {
     this.id = id++
-    this.container = {
-      $decorator: () => {},
-      $register: () => {},
-      $list: () => {},
-      $name: name
-    }
+    this.container = newContainer(name)
     if (typeof name === 'string') {
       return Bottle.pop(name)
     }
   }
 
+  /**
+   * Get an instance of bottle.
+   *
+   * If a name is provided the instance will be stored in a local record.  Calling Bottle.pop multiple
+   * times with the same name will return the same instance.
+   */
   public static pop(name?: string): Bottle {
     if (typeof name !== 'string') {
       return new Bottle()
@@ -32,6 +38,9 @@ export default class Bottle {
     return instance
   }
 
+  /**
+   * Clear one or all named bottles.
+   */
   public static clear(name?: string): void {
     if (typeof name === 'string') {
       delete bottles[name]
