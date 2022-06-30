@@ -1,12 +1,11 @@
 {
   "name": "bottlejs",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "A powerful dependency injection micro container",
   "main": "dist/bottle.js",
   "module": "dist/bottle-es.js",
   "typings": "dist/bottle.d.ts",
-  "scripts": {
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git://github.com/young-steveo/bottlejs.git"
@@ -15,9 +14,7 @@
     "di",
     "dependency",
     "injection",
-    "micro",
-    "angular",
-    "pimple"
+    "micro"
   ],
   "author": "Stephen Young <young.steveo@gmail.com>",
   "license": "MIT",
@@ -26,6 +23,6 @@
   },
   "homepage": "https://github.com/young-steveo/bottlejs",
   "devDependencies": {
-    "lodash": "^4.17.0"
+    "typescript": "^4.7.4"
   }
 }
