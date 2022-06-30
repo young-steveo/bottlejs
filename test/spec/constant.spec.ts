@@ -1,4 +1,4 @@
-import { Bottle } from '../../src/bottle'
+import Bottle from '../../src/bottle'
 
 /**
  * Bottle Constant test suite

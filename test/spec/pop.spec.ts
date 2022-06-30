@@ -1,4 +1,4 @@
-import { Bottle } from '../../src/bottle'
+import Bottle from '../../src/bottle'
 
 /**
  * Bottle Pop test suite
@@ -30,11 +30,11 @@ describe('Bottle#pop', function() {
     });
     it('will not have name if not passed a name parameter', function() {
         var bottle = Bottle.pop();
-        expect(bottle.container.BOTTLE_NAME).toBe(undefined);
+        expect(bottle.container.$name).toBe(undefined);
     });
     it('will make the instance name available when a name is passed', function() {
         var bottle = Bottle.pop('Soda');
-        expect(bottle.container.BOTTLE_NAME).toBe('Soda');
+        expect(bottle.container.$name).toBe('Soda');
     });
     it('will return the same instance when a name is passed, even if the string == false', function() {
         expect(Bottle.pop('')).toBe(Bottle.pop(''));
