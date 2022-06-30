@@ -7,7 +7,9 @@
   "type": "module",
   "typings": "dist/bottle.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "tslint -p tsconfig.json"
   },
   "repository": {
     "type": "git",
@@ -26,6 +28,9 @@
   },
   "homepage": "https://github.com/young-steveo/bottlejs",
   "devDependencies": {
+    "prettier": "^2.7.1",
+    "tslint": "^6.1.3",
+    "tslint-config-prettier": "^1.18.0",
     "typescript": "^4.7.4"
   }
 }
