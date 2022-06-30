@@ -1,3 +1,4 @@
+import { defineConstant } from './constant.js';
 import Container, { newContainer } from './container.js'
 
 const bottles: Record<string, Bottle> = {}
@@ -54,12 +55,7 @@ export default class Bottle {
   }
 
   public constant<Type>(name: string, value: Type): Bottle {
-    Object.defineProperty(this.container, name, {
-        configurable : false,
-        enumerable : true,
-        writable : false,
-        value
-    });
+    defineConstant(this.container, name, value)
     return this
   }
 }
