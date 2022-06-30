@@ -38,19 +38,9 @@ describe('Bottle#constant', function() {
         b.constant('nested.thing', '123');
 
         expect(b.container.nested.thing).toBe('123');
-
-        try {
-            b.container.nested.thing = 'xyz';
-        } catch (e) {
-            // TypeError: Attempted to assign to readonly property.
-        }
+        expect(() => b.container.nested.thing = 'xyz').toThrow(TypeError)
         expect(b.container.nested.thing).toBe('123');
-
-        try {
-            delete b.container.nested.thing;
-        } catch (e) {
-            // TypeError: Unable to delete property.
-        }
+        expect(() => delete b.container.nested.thing).toThrow(TypeError)
         expect(b.container.nested.thing).toBe('123');
     });
 });
