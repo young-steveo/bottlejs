@@ -8,6 +8,9 @@ import { ServiceConstructor, ServiceFactory, serviceFactory, serviceFactoryProvi
 const bottles: Record<string, Bottle> = {}
 
 export default class Bottle {
+
+    public static config: { strict: boolean } = { strict: false }
+
     /**
      * The container
      */
