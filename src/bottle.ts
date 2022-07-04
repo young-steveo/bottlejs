@@ -7,18 +7,11 @@ import { ServiceConstructor, ServiceFactory, serviceFactory, serviceFactoryProvi
 
 const bottles: Record<string, Bottle> = {}
 
-let id = 0
-
 export default class Bottle {
     /**
      * The container
      */
     public container: Container
-
-    /**
-     * Every bottle keeps track of an internal id
-     */
-    private id: number
 
     /**
      * Map of defined providers. `any` is used here because
@@ -33,7 +26,6 @@ export default class Bottle {
      * @param string name Optional name for the bottle instance
      */
     public constructor(name?: string) {
-        this.id = id++
         this.container = newContainer(this, name)
         if (name !== undefined) {
             return Bottle.pop(name)
