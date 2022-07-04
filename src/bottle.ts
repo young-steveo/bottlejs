@@ -1,9 +1,9 @@
 import { defineConstant } from './constant.js'
-import Container, { DELIMITER, Element, newContainer, resolveContainer, split } from './container.js'
+import Container, { DELIMITER, newContainer, resolveContainer, split } from './container.js'
 import Provider, { defineProvider, PROVIDER_SUFFIX } from './provider.js'
 import Factory, { factoryProvider, instanceFactory } from './factory.js';
 import { defineValue } from './value.js'
-import { resolveService } from './service.js';
+import { serviceFactory, serviceFactoryProvider } from './service.js';
 
 const bottles: Record<string, Bottle> = {}
 
@@ -135,9 +135,10 @@ export default class Bottle {
     }
 
     public service<Service>(name: string, service: new(...args: any[]) => Service, ...deps: string[]): Bottle {
-        return this.factory(name, (container): Service => {
-            const services = deps.map((depName: string): Element<any> => resolveService(container, depName), container)
-            return new service(...services)
-        })
+        return this.factory(name, serviceFactory(service, deps))
+    }
+
+    public serviceFactory<Service>(name: string, factory: (...args: any[]) => Service, ...deps:string[]): Bottle {
+        return this.provider(name, serviceFactoryProvider(factory, deps))
     }
 }
