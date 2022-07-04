@@ -1,8 +1,9 @@
 import { defineConstant } from './constant.js'
-import Container, { DELIMITER, newContainer, resolveNestedContainer, split } from './container.js'
+import Container, { DELIMITER, Element, newContainer, resolveContainer, split } from './container.js'
 import Provider, { defineProvider, PROVIDER_SUFFIX } from './provider.js'
 import Factory, { factoryProvider, instanceFactory } from './factory.js';
 import { defineValue } from './value.js'
+import { resolveService } from './service.js';
 
 const bottles: Record<string, Bottle> = {}
 
@@ -73,13 +74,13 @@ export default class Bottle {
     }
 
     public constant<Constant>(name: string, value: Constant): Bottle {
-        const container = resolveNestedContainer(this.container, name)
+        const container = resolveContainer(this.container, name)
         defineConstant(container, split(name)[1], value)
         return this
     }
 
     public value<Value>(name: string, value: Value): Bottle {
-        const container = resolveNestedContainer(this.container, name)
+        const container = resolveContainer(this.container, name)
         defineValue(container, split(name)[1], value)
         return this
     }
@@ -95,7 +96,7 @@ export default class Bottle {
         const parts = fullName.split(DELIMITER)
         let container = this.container
         if (parts.length) {
-            container = resolveNestedContainer(container, parts.join(DELIMITER))
+            container = resolveContainer(container, parts.join(DELIMITER))
         }
         const name = parts.pop()
         if (!name) {
@@ -115,7 +116,7 @@ export default class Bottle {
             if (names.length && names.indexOf(providerName) === -1) {
                 return
             }
-            const container = resolveNestedContainer(this.container, providerName)
+            const container = resolveContainer(this.container, providerName)
             const name = split(providerName)[1]
             const provider = this.providers[providerName]
             delete this.providers[providerName]
@@ -131,5 +132,12 @@ export default class Bottle {
 
     public instanceFactory<Service>(name: string, factory: Factory<Service>): Bottle {
         return this.factory(name, instanceFactory(factory))
+    }
+
+    public service<Service>(name: string, service: new(...args: any[]) => Service, ...deps: string[]): Bottle {
+        return this.factory(name, (container): Service => {
+            const services = deps.map((depName: string): Element<any> => resolveService(container, depName), container)
+            return new service(...services)
+        })
     }
 }

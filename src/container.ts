@@ -12,6 +12,18 @@ export default interface Container {
 
 type ContainerGetter = (container: Container, name: string) => Container
 
+export type Element<Service> = Service | Container | undefined;
+
+export function isContainer<Service>(element: Element<Service>): element is Container {
+    if (element === undefined) {
+        return false
+    }
+    const container = element as Container
+    return container.$decorator !== undefined &&
+        container.$register !== undefined &&
+        container.$list !== undefined
+}
+
 export const newContainer = (name?: string): Container => {
     return {
         $decorator: () => {},
@@ -43,6 +55,11 @@ export const split = (name: string): [string[], string] => {
 /**
  * Traverse nested containers
  */
-export const resolveNestedContainer: ContainerGetter = (container: Container, name: string): Container => {
+export const resolveContainer: ContainerGetter = (container: Container, name: string): Container => {
     return split(name)[0].reduce(getValueContainer, container)
+}
+
+export const getElement = <Service>(container: Container, name: string): Element<Service> => {
+    const element: Element<Service> = container[name];
+    return element
 }
