@@ -5,7 +5,7 @@ type Factory<Service> = (container: Container) => Service
 
 export default Factory
 
-interface InstanceFactory<Service> {
+export interface InstanceFactory<Service> {
     instance: () => Service
 }
 

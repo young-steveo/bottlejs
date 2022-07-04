@@ -1,3 +1,4 @@
+import Bottle from './bottle.js';
 import { defineValue } from './value.js'
 
 export const DELIMITER = '.'
@@ -5,9 +6,9 @@ export const DELIMITER = '.'
 export default interface Container {
     [key: string]: any
     $decorator: () => void
-    $register: () => void
     $list: () => void
     $name: string | undefined
+    $bottle: Bottle
 }
 
 type ContainerGetter = (container: Container, name: string) => Container
@@ -20,16 +21,16 @@ export function isContainer<Service>(element: Element<Service>): element is Cont
     }
     const container = element as Container
     return container.$decorator !== undefined &&
-        container.$register !== undefined &&
-        container.$list !== undefined
+        container.$list !== undefined &&
+        container.$bottle !== undefined
 }
 
-export const newContainer = (name?: string): Container => {
+export const newContainer = ($bottle: Bottle, $name?: string): Container => {
     return {
         $decorator: () => {},
-        $register: () => {},
         $list: () => {},
-        $name: name
+        $name,
+        $bottle
     }
 }
 
@@ -40,7 +41,7 @@ export const newContainer = (name?: string): Container => {
 export const getValueContainer: ContainerGetter = (container: Container, name: string): Container => {
     let nestedContainer = container[name]
     if (!nestedContainer) {
-        nestedContainer = newContainer(name)
+        nestedContainer = newContainer(container.$bottle, name)
         defineValue(container, name, nestedContainer)
     }
     return nestedContainer

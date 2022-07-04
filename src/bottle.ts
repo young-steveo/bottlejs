@@ -3,7 +3,7 @@ import Container, { DELIMITER, newContainer, resolveContainer, split } from './c
 import Provider, { defineProvider, PROVIDER_SUFFIX } from './provider.js'
 import Factory, { factoryProvider, instanceFactory } from './factory.js';
 import { defineValue } from './value.js'
-import { serviceFactory, serviceFactoryProvider } from './service.js';
+import { ServiceConstructor, ServiceFactory, serviceFactory, serviceFactoryProvider } from './service.js';
 
 const bottles: Record<string, Bottle> = {}
 
@@ -34,7 +34,7 @@ export default class Bottle {
      */
     public constructor(name?: string) {
         this.id = id++
-        this.container = newContainer(name)
+        this.container = newContainer(this, name)
         if (name !== undefined) {
             return Bottle.pop(name)
         }
@@ -134,11 +134,11 @@ export default class Bottle {
         return this.factory(name, instanceFactory(factory))
     }
 
-    public service<Service>(name: string, service: new(...args: any[]) => Service, ...deps: string[]): Bottle {
+    public service<Service>(name: string, service: ServiceConstructor<Service>, ...deps: string[]): Bottle {
         return this.factory(name, serviceFactory(service, deps))
     }
 
-    public serviceFactory<Service>(name: string, factory: (...args: any[]) => Service, ...deps:string[]): Bottle {
+    public serviceFactory<Service>(name: string, factory: ServiceFactory<Service>, ...deps:string[]): Bottle {
         return this.provider(name, serviceFactoryProvider(factory, deps))
     }
 }

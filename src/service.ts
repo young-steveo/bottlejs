@@ -13,13 +13,16 @@ const resolveServices = (container: Container, deps: string[]) => {
     return deps.map((depName: string): Element<any> => resolveService(container, depName), container)
 }
 
-export const serviceFactory = <Service>(service: new(...args: any[]) => Service, deps: string[]) => {
+export type ServiceConstructor<Service> = new(...args: any[]) => Service
+export type ServiceFactory<Service> = (...args: any[]) => Service
+
+export const serviceFactory = <Service>(service: ServiceConstructor<Service>, deps: string[]) => {
     return (container: Container): Service => {
         return new service(...resolveServices(container, deps))
     }
 }
 
-export const serviceFactoryProvider = <Service>(factory: (...args: any[]) => Service, deps: string[]): new() => Provider<Service> => {
+export const serviceFactoryProvider = <Service>(factory: ServiceFactory<Service>, deps: string[]): new() => Provider<Service> => {
     return class {
         $get(container: Container) {
             return factory(...resolveServices(container, deps));
