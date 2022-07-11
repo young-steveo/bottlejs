@@ -5,9 +5,7 @@ export const DELIMITER = '.'
 
 export default interface Container {
     [key: string]: any
-    $decorator: () => void
     $list: () => void
-    $name: string | undefined
     $bottle: Bottle
 }
 
@@ -20,17 +18,14 @@ export function isContainer<Service>(element: Element<Service>): element is Cont
         return false
     }
     const container = element as Container
-    return container.$decorator !== undefined &&
-        container.$list !== undefined &&
+    return container.$list !== undefined &&
         container.$bottle !== undefined
 }
 
-export const newContainer = ($bottle: Bottle, $name?: string): Container => {
+export const newContainer = (bottle: Bottle): Container => {
     return {
-        $decorator: () => {},
         $list: () => {},
-        $name,
-        $bottle
+        $bottle: bottle
     }
 }
 
@@ -41,7 +36,7 @@ export const newContainer = ($bottle: Bottle, $name?: string): Container => {
 export const getValueContainer: ContainerGetter = (container: Container, name: string): Container => {
     let nestedContainer = container[name]
     if (!nestedContainer) {
-        nestedContainer = newContainer(container.$bottle, name)
+        nestedContainer = newContainer(container.$bottle)
         defineValue(container, name, nestedContainer)
     }
     return nestedContainer

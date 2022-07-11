@@ -4,7 +4,9 @@ import Provider, { defineProvider, PROVIDER_SUFFIX } from './provider.js'
 import Factory, { factoryProvider, instanceFactory } from './factory.js';
 import { defineValue } from './value.js'
 import { ServiceConstructor, ServiceFactory, serviceFactory, serviceFactoryProvider } from './service.js';
+import { Decorator } from './decorator.js';
 
+const GLOBAL_NAME = '__global__';
 const bottles: Record<string, Bottle> = {}
 
 export default class Bottle {
@@ -18,10 +20,15 @@ export default class Bottle {
 
     /**
      * Map of defined providers. `any` is used here because
-     * the services provided by the providers are all defined
-     * externally by the users
+     * the services all defined externally by the users
      */
     private providers: Record<string, new () => Provider<any>> = {}
+
+    /**
+     * Map of defined decorators. `any` is used here because
+     * the services all defined externally by the users
+     */
+    public decorators: Record<string, Decorator<any>[]> = {}
 
     /**
      * Bottle constructor
@@ -29,7 +36,7 @@ export default class Bottle {
      * @param string name Optional name for the bottle instance
      */
     public constructor(name?: string) {
-        this.container = newContainer(this, name)
+        this.container = newContainer(this)
         if (name !== undefined) {
             return Bottle.pop(name)
         }
@@ -48,7 +55,6 @@ export default class Bottle {
         let instance = bottles[name]
         if (!instance) {
             bottles[name] = instance = new Bottle()
-            instance.container.$name = name
         }
         return instance
     }
@@ -102,7 +108,7 @@ export default class Bottle {
         }
         this.providers[fullName] = provider
 
-        defineProvider(container, name, provider)
+        defineProvider(container, fullName, name, provider)
         return this
     }
 
@@ -136,4 +142,19 @@ export default class Bottle {
     public serviceFactory<Service>(name: string, factory: ServiceFactory<Service>, ...deps:string[]): Bottle {
         return this.provider(name, serviceFactoryProvider(factory, deps))
     }
+
+    public decorator<Service>(name: string|Decorator<Service>, decorator?: Decorator<Service>): Bottle {
+        if (typeof name !== 'string') {
+            decorator = name;
+            name = GLOBAL_NAME;
+        }
+        if (decorator === undefined) {
+            throw Error('If naming a decorator, the second argument must be defined.')
+        }
+        if (!this.decorators[name]) {
+            this.decorators[name] = [];
+        }
+        this.decorators[name].push(decorator);
+        return this;
+    };
 }

@@ -1,4 +1,5 @@
 import Container from './container.js'
+import { Decorator, reducer } from './decorator.js';
 
 export const PROVIDER_SUFFIX = 'Provider'
 
@@ -6,11 +7,16 @@ export default interface Provider<Service> {
     $get: (container: Container) => Service
 }
 
+const getWithGlobal = <Service>(collection: Record<string, Decorator<Service>[]>, fullName: string) => {
+    return (collection[fullName] || []).concat(collection.__global__ || []);
+};
+
 /**
  * Create the provider properties on the container
  */
 export const defineProvider = <Service>(
     container: Container,
+    fullName: string,
     name: string,
     providerDef: new () => Provider<Service>
 ): void => {
@@ -32,9 +38,9 @@ export const defineProvider = <Service>(
         enumerable: true,
         get(): Service {
             const provider: Provider<Service> = container[providerName]
-            const instance = provider.$get(container)
+            let instance = provider.$get(container)
 
-            // @todo decorators
+            instance = getWithGlobal(container.$bottle.decorators, fullName).reduce(reducer, instance)
 
             delete container[providerName]
             delete container[name]
