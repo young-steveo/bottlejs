@@ -56,7 +56,8 @@ var createProvider = function createProvider(name, Provider) {
             var instance;
             if (provider) {
                 // filter through decorators
-                instance = getWithGlobal(decorators, name).reduce(reducer, provider.$get(container));
+                var $getFn = Array.isArray(provider.$get) ? provider.$get[provider.$get.length - 1] : provider.$get
+                instance = getWithGlobal(decorators, name).reduce(reducer, $getFn(container));
 
                 delete container[providerName];
                 delete container[name];
