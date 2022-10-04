@@ -42,6 +42,8 @@ var createProvider = function createProvider(name, Provider) {
         enumerable : true,
         get : function getProvider() {
             var instance = new Provider();
+            if (Array.isArray(instance.$get)) instance.$get = instance.$get[instance.$get.length - 1]
+            
             delete container[providerName];
             container[providerName] = instance;
             return instance;
@@ -56,8 +58,7 @@ var createProvider = function createProvider(name, Provider) {
             var instance;
             if (provider) {
                 // filter through decorators
-                var $getFn = Array.isArray(provider.$get) ? provider.$get[provider.$get.length - 1] : provider.$get
-                instance = getWithGlobal(decorators, name).reduce(reducer, $getFn(container));
+                instance = getWithGlobal(decorators, name).reduce(reducer, provider.$get(container));
 
                 delete container[providerName];
                 delete container[name];
