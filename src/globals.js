@@ -69,3 +69,14 @@ var getNestedBottle = function getNestedBottle(name) {
 var getNestedService = function getNestedService(fullname) {
     return fullname.split(DELIMITER).reduce(getNested, this);
 };
+
+/**
+ * Split a dot-notation string on head segment and rest segment.
+ *
+ * @param String fullname
+ * @return Array
+ */
+var splitHead = function splitHead(fullname) {
+    var parts = fullname.split(DELIMITER);
+    return parts.length > 1 ? [parts[0], parts.slice(1).join(DELIMITER)] : [parts[0]];
+};

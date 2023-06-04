@@ -28,9 +28,9 @@ var getWithGlobal = function getWithGlobal(collection, name) {
  * @return Bottle
  */
 var createProvider = function createProvider(name, Provider) {
-    var providerName, properties, container, id, decorators, middlewares;
+    var bottle, providerName, properties, container, decorators, middlewares;
 
-    id = this.id;
+    bottle = this;
     container = this.container;
     decorators = this.decorators;
     middlewares = this.middlewares;
@@ -55,14 +55,18 @@ var createProvider = function createProvider(name, Provider) {
             var provider = container[providerName];
             var instance;
             if (provider) {
+                bottle.capturingDepsOf.push(name);
                 // filter through decorators
                 instance = getWithGlobal(decorators, name).reduce(reducer, provider.$get(container));
+                bottle.capturingDepsOf.pop();
 
                 delete container[providerName];
                 delete container[name];
             }
-            return instance === undefined ? instance : applyMiddleware(getWithGlobal(middlewares, name),
-                name, instance, container);
+            if (instance === undefined) {
+                return instance;
+            }
+            return applyMiddleware.call(bottle, getWithGlobal(middlewares, name), name, instance, container);
         }
     };
 

@@ -11,7 +11,9 @@ Bottle = function Bottle(name) {
 
     this.id = id++;
 
+    this.capturingDepsOf = [];
     this.decorators = {};
+    this.dependents = {};
     this.middlewares = {};
     this.nested = {};
     this.providerMap = {};

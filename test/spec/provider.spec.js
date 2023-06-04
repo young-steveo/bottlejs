@@ -189,16 +189,88 @@
           expect(i).toEqual(2);
           expect(j).toEqual(1);
         });
-        it('allows for sub containers to re-initiate as well', function() {
+        it('allows to propagate the reset to the providers that depend on the selected service names', function() {
+          var i = 0;
+          var j = 0;
+          var k = 0;
+          var l = 0;
+          var b = new Bottle();
+          var FirstService= function() { i = ++i; };
+          var SecondProvider = function() {
+              j = ++j;
+              this.$get = function(container) { return { _first: container.First }; };
+          };
+          var ThirdFactory = function(container) { k = ++k; return { _first: container.First };  };
+          b.factory('Zero', function () { l = ++l; return 0; });
+          b.service('First', FirstService, 'Zero');
+          b.provider('Second', SecondProvider);
+          b.factory('Third', ThirdFactory);
+          expect(b.container.Second._first instanceof FirstService).toBe(true);
+          expect(b.container.Third._first instanceof FirstService).toBe(true);
+          expect(i).toEqual(1);
+          expect(j).toEqual(1);
+          expect(k).toEqual(1);
+          expect(l).toEqual(1);
+          b.resetProviders(['First'], true);
+          expect(b.container.Second._first instanceof FirstService).toBe(true);
+          expect(b.container.Third._first instanceof FirstService).toBe(true);
+          expect(i).toEqual(2);
+          expect(j).toEqual(2);
+          expect(k).toEqual(2);
+          expect(l).toEqual(1);
+          b.resetProviders(['Zero'], true);
+          expect(b.container.Second._first instanceof FirstService).toBe(true);
+          expect(b.container.Third._first instanceof FirstService).toBe(true);
+          expect(i).toEqual(3);
+          expect(j).toEqual(3);
+          expect(k).toEqual(3);
+          expect(l).toEqual(2);
+        });
+        it('will cleanup service dependents if a service is redefined', function() {
+          var i = 0;
+          var j = 0;
+          var k = 0;
+          var b = new Bottle();
+          var FirstService= function() { i = ++i; };
+          var SecondService = function() { j = ++j; };
+          var ThirdService = function() { k = ++k; };
+          b.service('First', FirstService);
+          b.service('Thing.Second', SecondService, 'First');
+          b.service('Third', ThirdService, 'Thing.Second');
+          expect(b.container.First instanceof FirstService).toBe(true);
+          expect(b.container.Thing.Second instanceof SecondService).toBe(true);
+          expect(b.container.Third instanceof ThirdService).toBe(true);
+          expect(i).toEqual(1);
+          expect(j).toEqual(1);
+          expect(k).toEqual(1);
+          b.resetProviders(['Thing.Second'], true);
+          // Redefined to have no dependencies
+          b.service('Thing.Second', SecondService);
+          expect(b.container.First instanceof FirstService).toBe(true);
+          expect(b.container.Thing.Second instanceof SecondService).toBe(true);
+          expect(b.container.Third instanceof ThirdService).toBe(true);
+          expect(i).toEqual(1);
+          expect(j).toEqual(2);
+          expect(k).toEqual(2);
+          // No propagation will happen given that no service depends on First anymore
+          b.resetProviders(['First'], true);
+          expect(b.container.First instanceof FirstService).toBe(true);
+          expect(b.container.Thing.Second instanceof SecondService).toBe(true);
+          expect(b.container.Third instanceof ThirdService).toBe(true);
+          expect(i).toEqual(2);
+          expect(j).toEqual(2);
+          expect(k).toEqual(2);
+        });
+        it('allows for deep sub containers to re-initiate as well', function() {
             var i = 0;
             var b = new Bottle();
             var ThingProvider = function() { i = ++i; this.$get = function() { return this; }; };
-            b.provider('Thing.Something', ThingProvider);
-            expect(b.container.Thing.Something instanceof ThingProvider).toBe(true);
+            b.provider('Thing.In.Something', ThingProvider);
+            expect(b.container.Thing.In.Something instanceof ThingProvider).toBe(true);
             // Intentionally calling twice to prove the construction is cached until reset
-            expect(b.container.Thing.Something instanceof ThingProvider).toBe(true);
+            expect(b.container.Thing.In.Something instanceof ThingProvider).toBe(true);
             b.resetProviders();
-            expect(b.container.Thing.Something instanceof ThingProvider).toBe(true);
+            expect(b.container.Thing.In.Something instanceof ThingProvider).toBe(true);
             expect(i).toEqual(2);
         });
         it('will not break if a nested container has multiple children', function() {

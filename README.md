@@ -381,11 +381,14 @@ Param        | Type       | Details
 **Provider** | *Function* | A constructor function that will be instantiated as a singleton.  Should expose a function called `$get` that will be used as a factory to instantiate the service.
 
 #### resetProviders(names)
-Param                      | Type       | Details
-:--------------------------|:-----------|:--------
-**names**<br />*(optional)*| *Array*    | An array of strings which contains names of the providers to be reset.
+Param                          | Type       | Details
+:------------------------------|:-----------|:--------
+**names**<br />*(optional)*    | *Array*    | An array of strings which contains names of the providers to be reset.
+**propagate**<br />*(optional)*| *Boolean*  | Propagate the reset to all providers that depend on the previous list.
 
-Used to reset providers for the next reference to re-instantiate the provider. If `names` param is passed, will reset only the named providers.
+Used to reset providers for the next reference to re-instantiate the provider.
+
+If `names` param is passed, will reset only the named providers. When reseting an specific list of providers, it is possible to also propagate the reset to providers that depend on those.
 
 #### register(Obj)
 #### container.$register(Obj)
