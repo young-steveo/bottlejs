@@ -1,5 +1,9 @@
 {
     "jasmine" : {
+        "options": {
+            "version": "3.8.0",
+            "noSandbox": true
+        },
         "tests" : {
             "src" : "dist/bottle.js",
             "options" : {

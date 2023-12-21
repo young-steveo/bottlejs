@@ -8,14 +8,24 @@
  * @return void
  */
 var applyMiddleware = function applyMiddleware(middleware, name, instance, container) {
+    var bottle = this;
     var descriptor = {
         configurable : true,
-        enumerable : true
-    };
-    if (middleware.length) {
-        descriptor.get = function getWithMiddlewear() {
-            var index = 0;
-            var next = function nextMiddleware(err) {
+        enumerable : true,
+        get : function getWithMiddlewear() {
+            var captureTarget,serviceDependents, index, next;
+            if (bottle.capturingDepsOf.length) {
+                captureTarget = bottle.capturingDepsOf[bottle.capturingDepsOf.length - 1];
+                serviceDependents = bottle.dependents[name] = bottle.dependents[name] || [];
+                if (serviceDependents.indexOf(captureTarget) === -1) {
+                    serviceDependents.push(captureTarget);
+                }
+            }
+            if (!middleware.length) {
+                return instance;
+            }
+            index = 0;
+            next = function nextMiddleware(err) {
                 if (err) {
                     throw err;
                 }
@@ -25,11 +35,8 @@ var applyMiddleware = function applyMiddleware(middleware, name, instance, conta
             };
             next();
             return instance;
-        };
-    } else {
-        descriptor.value = instance;
-        descriptor.writable = true;
-    }
+        },
+    };
 
     Object.defineProperty(container, name, descriptor);
 
