@@ -144,6 +144,97 @@ bottle.provider('Beer', function() {
 });
 ```
 
+## Lazy Loading
+
+Services registered with `service`, `serviceFactory`, `factory`, `instanceFactory` or `provider` are always lazy, and there is no way to turn that off.  Registering one only defines a getter on the container.  Values and constants are stored as they are.  The factory runs the first time something reads the property, and never again:
+
+```js
+var bottle = new Bottle();
+var count = 0;
+bottle.factory('Beer', function(container) {
+    count++;
+    return {};
+});
+
+console.log(count); // 0
+bottle.container.Beer;
+console.log(count); // 1
+bottle.container.Beer;
+console.log(count); // 1
+```
+
+Dependencies load the same way.  Reading a service builds the services it depends on first, and only those.  A service nobody reads is never built:
+
+```js
+var bottle = new Bottle();
+bottle.service('Hops', function() { console.log('Hops built'); });
+bottle.service('Beer', function(hops) { console.log('Beer built'); }, 'Hops');
+bottle.service('Wine', function() { console.log('Wine built'); });
+
+console.log('registered');  // registered
+bottle.container.Beer;      // Hops built
+                            // Beer built
+```
+
+Listing the container does not build anything either.  `bottle.list()` returns names without reading the properties.
+
+### Configuring a provider before first use
+
+The provider constructor is lazy too.  It runs the first time you read either the service or the provider itself, which is exposed on the container as the service name plus `Provider`.  That gives you a window to configure the provider before its `$get` builds the service:
+
+```js
+var bottle = new Bottle();
+bottle.provider('Beer', function() {
+    console.log('provider constructed');
+    var style = 'lager';
+    this.setStyle = function(newStyle) { style = newStyle; };
+    this.$get = function(container) {
+        console.log('$get called');
+        return { style: style };
+    };
+});
+
+bottle.container.BeerProvider.setStyle('stout'); // provider constructed
+console.log(bottle.container.Beer.style);        // $get called
+                                                  // stout
+```
+
+Once the service is built, Bottle deletes the provider from the container.  `bottle.container.BeerProvider` is `undefined` after the first read of `bottle.container.Beer`.
+
+### Loading services eagerly
+
+If you want services built up front, for example to surface a startup error early, pass their names to `Bottle#digest`.  It reads each one and returns the instances in the same order:
+
+```js
+var bottle = new Bottle();
+bottle.factory('Beer', function() { console.log('Beer built'); return 'beer'; });
+bottle.factory('Wine', function() { console.log('Wine built'); return 'wine'; });
+
+var drinks = bottle.digest(['Wine', 'Beer']); // Wine built
+                                               // Beer built
+console.log(drinks);                           // [ 'wine', 'beer' ]
+```
+
+### Rebuilding a service
+
+`Bottle#resetProviders` puts a service back in its unbuilt state.  The next read runs the provider and factory again:
+
+```js
+var bottle = new Bottle();
+var count = 0;
+bottle.factory('Beer', function() {
+    count++;
+    return { batch: count };
+});
+
+console.log(bottle.container.Beer.batch); // 1
+bottle.resetProviders(['Beer']);
+console.log(count);                       // 1
+console.log(bottle.container.Beer.batch); // 2
+```
+
+A service that already read `Beer` keeps the old instance.  To rebuild those dependents as well, pass `true` as the second argument (see `resetProviders(names)` in the API below).  Call it with no arguments to reset every provider on the bottle.  This is mostly useful in tests.
+
 ## Decorators
 
 Bottle supports injecting decorators into the provider pipeline with the `Bottle#decorator` method.  Bottle decorators are just simple functions that intercept a service in the provider phase after it has been created, but before it is accessed for the first time.  The function should return the service, or another object to be used as the service instead.
