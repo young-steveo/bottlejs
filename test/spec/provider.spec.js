@@ -299,5 +299,39 @@
             expect(b.container.Thing instanceof Thing).toBe(true);
             expect(b.container.Thing.dep).toBe(dep2);
         });
+        it('propagates a reset to a top level factory that reads a nested service', function() {
+            var n = 0;
+            var b = new Bottle();
+            b.factory('N.Dep', function() { return { v: ++n }; });
+            b.factory('S', function(c) { return { d: c.N.Dep }; });
+            expect(b.container.S.d.v).toBe(1);
+            b.resetProviders(['N.Dep'], true);
+            expect(b.container.S.d.v).toBe(2);
+        });
+        it('propagates a reset transitively across containers', function() {
+            var a = 0;
+            var s = 0;
+            var d = 0;
+            var b = new Bottle();
+            b.factory('N.Dep', function() { return { v: ++d }; });
+            b.factory('N.A', function(c) { a++; return { dep: c.Dep }; });
+            b.factory('S', function(c) { s++; return { a: c.N.A }; });
+            expect(b.container.S.a.dep.v).toBe(1);
+            b.resetProviders(['N.Dep']);
+            expect(b.container.S.a.dep.v).toBe(1);
+            expect([a, s, d]).toEqual([1, 1, 1]);
+            b.resetProviders(['N.Dep'], true);
+            expect(b.container.S.a.dep.v).toBe(2);
+            expect([a, s, d]).toEqual([2, 2, 2]);
+        });
+        it('propagates a reset from a deeply nested service', function() {
+            var n = 0;
+            var b = new Bottle();
+            b.factory('A.B.C', function() { return { v: ++n }; });
+            b.factory('Top', function(c) { return { c: c.A.B.C }; });
+            expect(b.container.Top.c.v).toBe(1);
+            b.resetProviders(['A.B.C'], true);
+            expect(b.container.Top.c.v).toBe(2);
+        });
     });
 }());

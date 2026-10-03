@@ -1,4 +1,24 @@
 /**
+ * Records the service currently being built as a dependent of 'name'. When this bottle is not building
+ * anything, the read happened inside a parent bottle's factory, so the record is made there instead.
+ *
+ * @param String name
+ * @return void
+ */
+var recordDependent = function recordDependent(name) {
+    var captureTarget, serviceDependents;
+    if (this.capturingDepsOf.length) {
+        captureTarget = this.capturingDepsOf[this.capturingDepsOf.length - 1];
+        serviceDependents = this.dependents[name] = this.dependents[name] || [];
+        if (serviceDependents.indexOf(captureTarget) === -1) {
+            serviceDependents.push(captureTarget);
+        }
+    } else if (this.parent) {
+        recordDependent.call(this.parent.bottle, this.parent.name + DELIMITER + name);
+    }
+};
+
+/**
  * Function used by provider to set up middleware for each request.
  *
  * @param Number id
@@ -13,14 +33,8 @@ var applyMiddleware = function applyMiddleware(middleware, name, instance, conta
         configurable : true,
         enumerable : true,
         get : function getWithMiddlewear() {
-            var captureTarget,serviceDependents, index, next;
-            if (bottle.capturingDepsOf.length) {
-                captureTarget = bottle.capturingDepsOf[bottle.capturingDepsOf.length - 1];
-                serviceDependents = bottle.dependents[name] = bottle.dependents[name] || [];
-                if (serviceDependents.indexOf(captureTarget) === -1) {
-                    serviceDependents.push(captureTarget);
-                }
-            }
+            var index, next;
+            recordDependent.call(bottle, name);
             if (!middleware.length) {
                 return instance;
             }

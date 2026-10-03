@@ -61,9 +61,10 @@ declare class Bottle<EntryName extends string = string> {
     provider(name: EntryName, Provider: ((...any: any[]) => void)): this;
 
     /**
-     * Reset providers on the bottle instance.
+     * Reset providers on the bottle instance. Pass names to reset only those providers, and propagate
+     * to also reset the services that depend on them.
      */
-    resetProviders(): void;
+    resetProviders(names?: string[], propagate?: boolean): void;
 
     /**
      * Register a service, factory, provider, or value based on properties of the Obj.

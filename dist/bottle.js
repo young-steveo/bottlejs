@@ -1,10 +1,10 @@
 ;(function(undefined) {
     'use strict';
     /**
-     * BottleJS v2.0.1 - 2022-06-28
+     * BottleJS v2.0.1 - 2026-10-03
      * A powerful dependency injection micro container
      *
-     * Copyright (c) 2022 Stephen Young
+     * Copyright (c) 2026 Stephen Young
      * Licensed MIT
      */
     var Bottle;
@@ -61,6 +61,7 @@
         var bottle;
         if (!this.nested[name]) {
             bottle = Bottle.pop();
+            bottle.parent = { bottle : this, name : name };
             this.nested[name] = bottle;
             this.factory(name, function SubProviderFactory() {
                 return bottle.container;
@@ -80,6 +81,37 @@
     };
     
     /**
+     * Split a dot-notation string on head segment and rest segment.
+     *
+     * @param String fullname
+     * @return Array
+     */
+    var splitHead = function splitHead(fullname) {
+        var parts = fullname.split(DELIMITER);
+        return parts.length > 1 ? [parts[0], parts.slice(1).join(DELIMITER)] : [parts[0]];
+    };
+    
+    /**
+     * Records the service currently being built as a dependent of 'name'. When this bottle is not building
+     * anything, the read happened inside a parent bottle's factory, so the record is made there instead.
+     *
+     * @param String name
+     * @return void
+     */
+    var recordDependent = function recordDependent(name) {
+        var captureTarget, serviceDependents;
+        if (this.capturingDepsOf.length) {
+            captureTarget = this.capturingDepsOf[this.capturingDepsOf.length - 1];
+            serviceDependents = this.dependents[name] = this.dependents[name] || [];
+            if (serviceDependents.indexOf(captureTarget) === -1) {
+                serviceDependents.push(captureTarget);
+            }
+        } else if (this.parent) {
+            recordDependent.call(this.parent.bottle, this.parent.name + DELIMITER + name);
+        }
+    };
+    
+    /**
      * Function used by provider to set up middleware for each request.
      *
      * @param Number id
@@ -89,14 +121,18 @@
      * @return void
      */
     var applyMiddleware = function applyMiddleware(middleware, name, instance, container) {
+        var bottle = this;
         var descriptor = {
             configurable : true,
-            enumerable : true
-        };
-        if (middleware.length) {
-            descriptor.get = function getWithMiddlewear() {
-                var index = 0;
-                var next = function nextMiddleware(err) {
+            enumerable : true,
+            get : function getWithMiddlewear() {
+                var index, next;
+                recordDependent.call(bottle, name);
+                if (!middleware.length) {
+                    return instance;
+                }
+                index = 0;
+                next = function nextMiddleware(err) {
                     if (err) {
                         throw err;
                     }
@@ -106,11 +142,8 @@
                 };
                 next();
                 return instance;
-            };
-        } else {
-            descriptor.value = instance;
-            descriptor.writable = true;
-        }
+            },
+        };
     
         Object.defineProperty(container, name, descriptor);
     
@@ -174,9 +207,9 @@
      * @return Bottle
      */
     var createProvider = function createProvider(name, Provider) {
-        var providerName, properties, container, id, decorators, middlewares;
+        var bottle, providerName, properties, container, decorators, middlewares;
     
-        id = this.id;
+        bottle = this;
         container = this.container;
         decorators = this.decorators;
         middlewares = this.middlewares;
@@ -201,14 +234,18 @@
                 var provider = container[providerName];
                 var instance;
                 if (provider) {
+                    bottle.capturingDepsOf.push(name);
                     // filter through decorators
                     instance = getWithGlobal(decorators, name).reduce(reducer, provider.$get(container));
+                    bottle.capturingDepsOf.pop();
     
                     delete container[providerName];
                     delete container[name];
                 }
-                return instance === undefined ? instance : applyMiddleware(getWithGlobal(middlewares, name),
-                    name, instance, container);
+                if (instance === undefined) {
+                    return instance;
+                }
+                return applyMiddleware.call(bottle, getWithGlobal(middlewares, name), name, instance, container);
             }
         };
     
@@ -265,6 +302,12 @@
     var createService = function createService(name, Service, isClass) {
         var deps = arguments.length > 3 ? slice.call(arguments, 3) : [];
         var bottle = this;
+        deps.forEach(function registerDependents(otherService) {
+            var serviceDependents = bottle.dependents[otherService] = bottle.dependents[otherService] || [];
+            if (serviceDependents.indexOf(name) === -1) {
+                serviceDependents.push(name);
+            }
+        });
         return factory.call(this, name, function GenericFactory() {
             var serviceFactory = Service; // alias for jshint
             var args = deps.map(getNestedService, bottle.container);
@@ -521,31 +564,78 @@
      * @return void
      */
     var removeProviderMap = function resetProvider(name) {
+        var parts = splitHead(name);
+        if (parts.length > 1) {
+             removeProviderMap.call(getNestedBottle.call(this, parts[0]), parts[1]);
+        }
         delete this.providerMap[name];
         delete this.container[name];
         delete this.container[name + PROVIDER_SUFFIX];
     };
     
     /**
+     * Clears a reseted service from the dependencies tracker.
+     *
+     * @param String name
+     * @return void
+     */
+    var removeFromDeps = function removeFromDeps(name) {
+        var parts = splitHead(name);
+        if (parts.length > 1) {
+             removeFromDeps.call(getNestedBottle.call(this, parts[0]), parts[1]);
+        }
+        Object.keys(this.dependents).forEach(function clearDependents(serviceName) {
+            if (this.dependents[serviceName]) {
+                this.dependents[serviceName] = this.dependents[serviceName]
+                    .filter(function (dependent) { return dependent !== name; });
+            }
+        }, this);
+    };
+    
+    /**
+     * Resets the services that depend on a provider. A dotted name is cascaded by its nested bottle, so only
+     * undotted names consult this bottle's own dependents. A nested bottle also cascades into its parent.
+     *
+     * @param String name
+     * @param Boolean isLocal
+     * @return void
+     */
+    var cascadeDependents = function cascadeDependents(name, isLocal) {
+        var dependents = isLocal && this.dependents[name];
+        var parentDependents = this.parent && this.parent.bottle.dependents[this.parent.name + DELIMITER + name];
+        if (dependents && dependents.length) {
+            this.resetProviders(dependents, true);
+        }
+        if (parentDependents && parentDependents.length) {
+            this.parent.bottle.resetProviders(parentDependents, true);
+        }
+    };
+    
+    /**
      * Resets providers on a bottle instance. If 'names' array is provided, only the named providers will be reset.
      *
      * @param Array names
+     * @param Boolean [propagate]
      * @return void
      */
-    var resetProviders = function resetProviders(names) {
-        var tempProviders = this.originalProviders;
+    var resetProviders = function resetProviders(names, propagate) {
         var shouldFilter = Array.isArray(names);
-    
         Object.keys(this.originalProviders).forEach(function resetProvider(originalProviderName) {
             if (shouldFilter && names.indexOf(originalProviderName) === -1) {
                 return;
             }
-            var parts = originalProviderName.split(DELIMITER);
+            var parts = splitHead(originalProviderName);
             if (parts.length > 1) {
-                parts.forEach(removeProviderMap, getNestedBottle.call(this, parts[0]));
+                resetProviders.call(getNestedBottle.call(this, parts[0]), [parts[1]], propagate);
+            }
+            if (shouldFilter && propagate) {
+                cascadeDependents.call(this, originalProviderName, parts.length === 1);
+            }
+            if (shouldFilter) {
+                removeFromDeps.call(this, originalProviderName);
             }
             removeProviderMap.call(this, originalProviderName);
-            this.provider(originalProviderName, tempProviders[originalProviderName]);
+            this.provider(originalProviderName, this.originalProviders[originalProviderName]);
         }, this);
     };
     
@@ -577,7 +667,9 @@
     
         this.id = id++;
     
+        this.capturingDepsOf = [];
         this.decorators = {};
+        this.dependents = {};
         this.middlewares = {};
         this.nested = {};
         this.providerMap = {};

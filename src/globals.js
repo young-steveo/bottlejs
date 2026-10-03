@@ -52,6 +52,7 @@ var getNestedBottle = function getNestedBottle(name) {
     var bottle;
     if (!this.nested[name]) {
         bottle = Bottle.pop();
+        bottle.parent = { bottle : this, name : name };
         this.nested[name] = bottle;
         this.factory(name, function SubProviderFactory() {
             return bottle.container;

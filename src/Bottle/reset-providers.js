@@ -34,6 +34,25 @@ var removeFromDeps = function removeFromDeps(name) {
 };
 
 /**
+ * Resets the services that depend on a provider. A dotted name is cascaded by its nested bottle, so only
+ * undotted names consult this bottle's own dependents. A nested bottle also cascades into its parent.
+ *
+ * @param String name
+ * @param Boolean isLocal
+ * @return void
+ */
+var cascadeDependents = function cascadeDependents(name, isLocal) {
+    var dependents = isLocal && this.dependents[name];
+    var parentDependents = this.parent && this.parent.bottle.dependents[this.parent.name + DELIMITER + name];
+    if (dependents && dependents.length) {
+        this.resetProviders(dependents, true);
+    }
+    if (parentDependents && parentDependents.length) {
+        this.parent.bottle.resetProviders(parentDependents, true);
+    }
+};
+
+/**
  * Resets providers on a bottle instance. If 'names' array is provided, only the named providers will be reset.
  *
  * @param Array names
@@ -50,8 +69,8 @@ var resetProviders = function resetProviders(names, propagate) {
         if (parts.length > 1) {
             resetProviders.call(getNestedBottle.call(this, parts[0]), [parts[1]], propagate);
         }
-        if (shouldFilter && propagate && this.dependents[originalProviderName]) {
-            this.resetProviders(this.dependents[originalProviderName], propagate);
+        if (shouldFilter && propagate) {
+            cascadeDependents.call(this, originalProviderName, parts.length === 1);
         }
         if (shouldFilter) {
             removeFromDeps.call(this, originalProviderName);
